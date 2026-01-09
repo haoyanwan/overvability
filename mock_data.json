@@ -1,0 +1,207 @@
+{
+  "generated_at": "2026-01-07T18:15:23.484828",
+  "total_services": 9,
+  "total_vms": 16,
+  "services": [
+    {
+      "service": "fleetWeb",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aftersales-fra-frontend-01",
+          "ip": "10.139.0.33",
+          "coreCount": 2,
+          "memory": "8GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "vdf",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aftersales-release-fra-01",
+          "ip": "10.139.0.8",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running"
+        },
+        {
+          "name": "willand-aftersales-release-fra-02",
+          "ip": "10.139.0.15",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running"
+        },
+        {
+          "name": "willand-aftersales-release-fra-03",
+          "ip": "10.139.0.32",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "aiChat",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aichatServer-01",
+          "ip": "10.139.0.23",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "mqttBroker",
+      "businessOwner": "base",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-base-mqttbroker-fra-01",
+          "ip": "10.139.0.52",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running"
+        },
+        {
+          "name": "willand-base-mqttbroker-fra-02",
+          "ip": "10.139.0.53",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "fleet",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-fleet-fra-01",
+          "ip": "10.139.0.36",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-minimal-focal minimal-20_04-lts-gen2",
+          "status": "running"
+        },
+        {
+          "name": "willand-fleet-fra-02",
+          "ip": "10.139.0.37",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-minimal-focal minimal-20_04-lts-gen2",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "mowerbot",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-mowerbot-fra-01",
+          "ip": "10.139.0.27",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running"
+        },
+        {
+          "name": "willand-mowerbot-fra-02",
+          "ip": "10.139.0.28",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "openApi",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-openai-fra-01",
+          "ip": "10.139.0.43",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-jammy 22_04-lts-gen2",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "operation",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-operation-fra-01",
+          "ip": "10.139.0.24",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "0001-com-ubuntu-server-jammy 22_04-lts-gen2",
+          "status": "running"
+        },
+        {
+          "name": "willand-operation-fra-02",
+          "ip": "10.139.0.57",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running"
+        }
+      ]
+    },
+    {
+      "service": "userLink",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-user-link-fra-1",
+          "ip": "10.139.0.20",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running"
+        },
+        {
+          "name": "willand-user-link-fra-2",
+          "ip": "10.139.0.21",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running"
+        }
+      ]
+    }
+  ]
+}

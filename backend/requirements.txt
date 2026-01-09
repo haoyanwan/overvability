@@ -1,0 +1,9 @@
+flask
+flask-cors
+python-dotenv
+azure-identity
+azure-mgmt-compute
+azure-mgmt-network
+azure-mgmt-subscription
+prometheus-api-client
+tinydb

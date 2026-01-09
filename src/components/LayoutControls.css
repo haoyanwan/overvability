@@ -1,0 +1,43 @@
+.layout-controls {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+
+.layout-controls button {
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.layout-controls button:hover {
+  background: var(--bg-tertiary);
+  box-shadow: 0 2px 8px var(--shadow-hover);
+}
+
+.layout-controls button.saved {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.layout-controls button.error {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.layout-controls button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

@@ -1,0 +1,210 @@
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 330px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--shadow-hover);
+  z-index: 10;
+  animation: slideIn 0.25s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--border-hover);
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h3 {
+  margin: 0;
+}
+
+.sidebar-header button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.sidebar-header button:hover {
+  color: var(--text-primary);
+}
+
+.sidebar-content {
+  padding: 16px;
+}
+
+.sidebar-content p {
+  margin: 8px 0;
+}
+
+.sidebar-field {
+  margin-bottom: 16px;
+}
+
+.sidebar-field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-field span {
+  display: block;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.sidebar-vms {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sidebar-vms-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+}
+
+.sidebar-vm {
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.sidebar-vm-field {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+.sidebar-vm-label {
+  color: var(--text-muted);
+}
+
+.sidebar-vm-value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* VM Metrics section */
+.sidebar-vm-metrics {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.sidebar-vm-metrics-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  background: rgba(139, 92, 246, 0.15);
+  border-left: 2px solid #8b5cf6;
+  border-radius: 3px;
+}
+
+.sidebar-vm-metrics-group {
+  margin-bottom: 8px;
+}
+
+.sidebar-vm-metrics-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-vm-metrics-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.sidebar-vm-metrics-label {
+  color: var(--text-muted);
+}
+
+.sidebar-vm-metrics-value {
+  font-weight: 600;
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+
+.sidebar-vm-metrics-updated {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* Metric status colors */
+.metric-good {
+  color: #22c55e;
+}
+
+.metric-warning {
+  color: #f59e0b;
+}
+
+.metric-critical {
+  color: #ef4444;
+}
+
+.metric-na {
+  color: var(--text-muted);
+}
