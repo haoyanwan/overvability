@@ -7,6 +7,8 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "vite --config config/vite.config.ts",
     "dev:backend": "cd backend && python app.py",
+    "devl": "concurrently \"npm run dev:frontend\" \"npm run devl:backend\"",
+    "devl:backend": "cd backend && python3 app.py",
     "build": "tsc -b && vite build --config config/vite.config.ts",
     "lint": "eslint . --config config/eslint.config.js",
     "preview": "vite preview --config config/vite.config.ts"

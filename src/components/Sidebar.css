@@ -1,12 +1,27 @@
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.sidebar-toggle {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff;
 }
 
 .sidebar {
@@ -21,7 +36,6 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px var(--shadow-hover);
   z-index: 10;
-  animation: slideIn 0.25s ease-out;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
 }
@@ -72,6 +86,13 @@
 
 .sidebar-content {
   padding: 16px;
+}
+
+.sidebar-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 40px 16px;
 }
 
 .sidebar-content p {

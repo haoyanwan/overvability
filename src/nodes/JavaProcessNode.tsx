@@ -64,16 +64,7 @@ export function JavaProcessNode({ data, selected }: JavaProcessNodeProps) {
             </div>
             <div className="service-node__body">
                 <div className="service-node__icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <rect x="2" y="3" width="20" height="14" rx="2" />
-                        <line x1="2" y1="8" x2="22" y2="8" />
-                        <circle cx="6" cy="5.5" r="0.5" fill="currentColor" />
-                        <circle cx="9" cy="5.5" r="0.5" fill="currentColor" />
-                        <line x1="6" y1="11" x2="18" y2="11" />
-                        <line x1="6" y1="14" x2="14" y2="14" />
-                        <line x1="8" y1="17" x2="8" y2="21" />
-                        <line x1="16" y1="17" x2="16" y2="21" />
-                    </svg>
+                    <img src="/azure-vms-icon.webp" alt="VM" />
                 </div>
                 <div className="service-node__content">
                     <div className="service-node__service">{data.service}</div>
@@ -86,25 +77,25 @@ export function JavaProcessNode({ data, selected }: JavaProcessNodeProps) {
             <div className="service-node__metrics">
                 <div className="service-node__metrics-row">
                     <span className="service-node__metrics-label">CPU</span>
-                    <span className={`service-node__metrics-value ${getMetricColorClass(metrics.cpuPeak)}`}>
+                    <span className={`service-node__metrics-value no-flickr ${getMetricColorClass(metrics.cpuPeak)}`}>
                         峰值 {formatMetric(metrics.cpuPeak)}
                     </span>
-                    <span className={`service-node__metrics-value ${getMetricColorClass(metrics.cpuAvg)}`}>
+                    <span className={`service-node__metrics-value no-flickr ${getMetricColorClass(metrics.cpuAvg)}`}>
                         平均 {formatMetric(metrics.cpuAvg)}
                     </span>
                 </div>
                 <div className="service-node__metrics-row">
                     <span className="service-node__metrics-label">内存</span>
-                    <span className={`service-node__metrics-value ${getMetricColorClass(metrics.memPeak)}`}>
+                    <span className={`service-node__metrics-value no-flickr ${getMetricColorClass(metrics.memPeak)}`}>
                         峰值 {formatMetric(metrics.memPeak)}
                     </span>
-                    <span className={`service-node__metrics-value ${getMetricColorClass(metrics.memAvg)}`}>
+                    <span className={`service-node__metrics-value no-flickr ${getMetricColorClass(metrics.memAvg)}`}>
                         平均 {formatMetric(metrics.memAvg)}
                     </span>
                 </div>
                 <div className="service-node__metrics-row">
                     <span className="service-node__metrics-label">存储</span>
-                    <span className={`service-node__metrics-value service-node__metrics-value--wide ${getMetricColorClass(metrics.storageAvg)}`}>
+                    <span className={`service-node__metrics-value service-node__metrics-value--wide no-flickr ${getMetricColorClass(metrics.storageAvg)}`}>
                         {formatMetric(metrics.storageAvg)}
                     </span>
                 </div>

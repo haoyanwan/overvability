@@ -1,0 +1,71 @@
+.group-node {
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 78, 105, 0.12);
+  border-radius: 12px;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.react-flow__node-group {
+  background: none;
+}
+
+.group-node--selected {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.group-node__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px 12px 0 0;
+}
+
+.group-node__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.group-node__tag {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.group-node__count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* Resizer styling */
+.group-node__resizer-line {
+  border-color: var(--border-hover) !important;
+}
+
+.group-node__resizer-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--bg-secondary) !important;
+  border: 2px solid var(--border-hover) !important;
+  border-radius: 3px !important;
+}
+
+/* Ensure service nodes render above group background */
+.react-flow__node-javaProcess {
+  z-index: 1 !important;
+}

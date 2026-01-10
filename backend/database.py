@@ -46,7 +46,7 @@ def save_vm_data(services_data: dict):
     table.upsert(record, VmData.type == "vm_data")
 
 
-def read_vm_data() -> dict | None:
+def read_vm_data():
     """Read VM data from TinyDB."""
     table = get_vms_table()
     VmData = Query()
@@ -69,7 +69,7 @@ def save_metrics_data(metrics_by_ip: dict):
     table.upsert(record, MetricsData.type == "metrics_data")
 
 
-def read_metrics_data() -> dict | None:
+def read_metrics_data():
     """Read metrics data from TinyDB."""
     table = get_metrics_table()
     MetricsData = Query()
@@ -78,7 +78,7 @@ def read_metrics_data() -> dict | None:
     return result[0] if result else None
 
 
-def get_all_vm_ips() -> list:
+def get_all_vm_ips():
     """Extract all VM IPs from stored VM data."""
     vm_data = read_vm_data()
     if not vm_data:

@@ -1,20 +1,160 @@
-import { ReactFlow, Background, Controls, applyEdgeChanges, applyNodeChanges, addEdge, MarkerType, type Node } from '@xyflow/react';
+import { ReactFlow, ReactFlowProvider, Background, Controls, applyEdgeChanges, applyNodeChanges, addEdge, MarkerType, type Node } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './App.css';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { JavaProcessNode } from './nodes/JavaProcessNode';
+import { GroupNode } from './nodes/GroupNode';
 import { Sidebar } from './components/Sidebar';
 import { LayoutControls } from './components/LayoutControls';
 import { LoadingOverlay } from './components/LoadingOverlay';
-import type { VmMetrics, VmInfo } from './types/nodes';
+import { BusinessOwnerNav } from './components/BusinessOwnerNav';
+import type { VmMetrics, VmInfo, GroupNodeData } from './types/nodes';
 
 const nodeTypes = {
   javaProcess: JavaProcessNode,
+  group: GroupNode,
 };
 
 // Polling intervals
 const VM_POLL_INTERVAL = 30 * 60 * 1000; // 30 minutes
 const METRICS_POLL_INTERVAL = 30 * 1000; // 30 seconds
+
+// Layout configuration
+const GROUP_PADDING = 60;
+const HEADER_HEIGHT = 50;
+const NODE_WIDTH = 240;
+const NODE_HEIGHT = 200;
+const NODE_GAP_X = 20;
+const NODE_GAP_Y = 20;
+const GROUP_GAP_X = 60;
+const GROUP_GAP_Y = 60;
+const NODES_PER_ROW = 2;
+const GROUPS_PER_ROW = 3;
+
+// Saved layout type
+interface SavedLayout {
+  nodes?: { id: string; position: { x: number; y: number }; width?: number; height?: number }[];
+  edges?: any[];
+}
+
+// Helper function to create nodes with groups
+function createNodesWithGroups(
+  services: any[],
+  existingNodes: Node[],
+  savedLayout?: SavedLayout
+): Node[] {
+  // Group services by businessOwner
+  const servicesByOwner: Record<string, any[]> = {};
+  for (const service of services) {
+    const owner = service.businessOwner || 'default';
+    if (!servicesByOwner[owner]) {
+      servicesByOwner[owner] = [];
+    }
+    servicesByOwner[owner].push(service);
+  }
+
+  const allNodes: Node[] = [];
+  const owners = Object.keys(servicesByOwner);
+
+  let groupX = 50;
+  let groupY = 50;
+  let maxGroupHeightInRow = 0;
+  let groupsInCurrentRow = 0;
+
+  owners.forEach((owner) => {
+    const ownerServices = servicesByOwner[owner];
+    const childCount = ownerServices.length;
+
+    // Calculate grid dimensions for children
+    const cols = Math.min(childCount, NODES_PER_ROW);
+    const rows = Math.ceil(childCount / NODES_PER_ROW);
+
+    // Calculate group dimensions
+    const groupWidth = cols * (NODE_WIDTH + NODE_GAP_X) + GROUP_PADDING * 2 - NODE_GAP_X;
+    const groupHeight = rows * (NODE_HEIGHT + NODE_GAP_Y) + HEADER_HEIGHT + GROUP_PADDING - NODE_GAP_Y;
+
+    // Group node ID
+    const groupId = `group-${owner}`;
+
+    // Check for saved or existing position
+    const savedGroupNode = savedLayout?.nodes?.find(n => n.id === groupId);
+    const existingGroupNode = existingNodes.find(n => n.id === groupId);
+
+    const groupPosition = savedGroupNode?.position ||
+      existingGroupNode?.position ||
+      { x: groupX, y: groupY };
+
+    // Create group node
+    const groupNode: Node = {
+      id: groupId,
+      type: 'group',
+      position: groupPosition,
+      data: {
+        businessOwner: owner,
+        label: owner,
+        childCount,
+      } as GroupNodeData,
+      style: {
+        width: savedGroupNode?.width || existingGroupNode?.style?.width || groupWidth,
+        height: savedGroupNode?.height || existingGroupNode?.style?.height || groupHeight,
+      },
+      draggable: true,
+    };
+
+    allNodes.push(groupNode);
+
+    // Create child nodes with relative positions
+    ownerServices.forEach((service, serviceIndex) => {
+      const col = serviceIndex % NODES_PER_ROW;
+      const row = Math.floor(serviceIndex / NODES_PER_ROW);
+
+      // Default relative position within group
+      const relativeX = GROUP_PADDING + col * (NODE_WIDTH + NODE_GAP_X);
+      const relativeY = HEADER_HEIGHT + row * (NODE_HEIGHT + NODE_GAP_Y);
+
+      const nodeId = service.service;
+      const savedNode = savedLayout?.nodes?.find(n => n.id === nodeId);
+      const existingNode = existingNodes.find(n => n.id === nodeId);
+
+      // Use saved/existing relative position if available, otherwise calculate
+      const childPosition = savedNode?.position ||
+        existingNode?.position ||
+        { x: relativeX, y: relativeY };
+
+      const childNode: Node = {
+        id: nodeId,
+        type: 'javaProcess',
+        position: childPosition,
+        parentId: groupId,
+        extent: 'parent',
+        data: {
+          service: service.service,
+          businessOwner: service.businessOwner,
+          status: service.vms.every((vm: any) => vm.status === 'running') ? 'healthy' : 'unhealthy',
+          vms: service.vms,
+        },
+        draggable: true,
+      };
+
+      allNodes.push(childNode);
+    });
+
+    // Update position for next group
+    groupsInCurrentRow++;
+    maxGroupHeightInRow = Math.max(maxGroupHeightInRow, groupHeight);
+
+    if (groupsInCurrentRow >= GROUPS_PER_ROW) {
+      groupX = 50;
+      groupY += maxGroupHeightInRow + GROUP_GAP_Y;
+      maxGroupHeightInRow = 0;
+      groupsInCurrentRow = 0;
+    } else {
+      groupX += groupWidth + GROUP_GAP_X;
+    }
+  });
+
+  return allNodes;
+}
 
 export default function App() {
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -38,6 +178,10 @@ export default function App() {
   );
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
+    // Only show sidebar for service nodes, not group nodes
+    if (node.type === 'group') {
+      return;
+    }
     setSelectedNode(node);
   }, []);
 
@@ -50,6 +194,11 @@ export default function App() {
       nodes: nodes.map(node => ({
         id: node.id,
         position: node.position,
+        // Include width/height for group nodes (NodeResizer updates width/height directly)
+        ...(node.type === 'group' ? {
+          width: node.measured?.width ?? node.width ?? node.style?.width,
+          height: node.measured?.height ?? node.height ?? node.style?.height,
+        } : {}),
       })),
       edges: edges,
     };
@@ -61,12 +210,38 @@ export default function App() {
   }, [nodes, edges]);
 
   const resetLayout = useCallback(async () => {
-    setNodes([]);
-    setEdges([]);
-    await fetch('http://localhost:5000/api/layout', { method: 'DELETE' });
+    try {
+      const res = await fetch('http://localhost:5000/api/layout');
+      const savedLayout: SavedLayout = await res.json();
+
+      if (savedLayout.nodes) {
+        setNodes(currentNodes => currentNodes.map(node => {
+          const savedNode = savedLayout.nodes!.find(n => n.id === node.id);
+          if (!savedNode) return node;
+
+          return {
+            ...node,
+            position: savedNode.position,
+            // Restore width/height for group nodes
+            ...(node.type === 'group' && savedNode.width && savedNode.height ? {
+              style: {
+                ...node.style,
+                width: savedNode.width,
+                height: savedNode.height,
+              },
+            } : {}),
+          };
+        }));
+      }
+      if (savedLayout.edges) {
+        setEdges(savedLayout.edges);
+      }
+    } catch (error) {
+      console.error('Failed to load saved layout:', error);
+    }
   }, []);
 
-  // Fetch metrics from the backend (GET request, reads from TinyDB)
+  // Fetch metrics from the backend
   const fetchMetrics = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:5000/api/metrics');
@@ -75,6 +250,9 @@ export default function App() {
 
       setNodes(currentNodes => {
         return currentNodes.map(node => {
+          // Skip group nodes
+          if (node.type === 'group') return node;
+
           const vms = (node.data?.vms as VmInfo[]) || [];
           const updatedVms = vms.map(vm => {
             const metrics = metricsMap[vm.ip];
@@ -91,7 +269,7 @@ export default function App() {
       });
 
       setSelectedNode(current => {
-        if (!current) return null;
+        if (!current || current.type === 'group') return current;
         const vms = (current.data?.vms as VmInfo[]) || [];
         const updatedVms = vms.map(vm => {
           const metrics = metricsMap[vm.ip];
@@ -119,23 +297,7 @@ export default function App() {
       }
       const data = await response.json();
 
-      setNodes(currentNodes => {
-        return data.services.map((service: any, index: number) => {
-          const existingNode = currentNodes.find(n => n.id === service.service);
-
-          return {
-            id: service.service,
-            position: existingNode?.position ?? { x: (index % 3) * 350, y: Math.floor(index / 3) * 300 },
-            data: {
-              service: service.service,
-              businessOwner: service.businessOwner,
-              status: service.vms.every((vm: any) => vm.status === 'running') ? 'healthy' : 'unhealthy',
-              vms: service.vms,
-            },
-            type: 'javaProcess',
-          };
-        });
-      });
+      setNodes(currentNodes => createNodesWithGroups(data.services, currentNodes));
     } catch (error) {
       console.error('Failed to fetch VM data:', error);
     }
@@ -154,7 +316,7 @@ export default function App() {
 
     const init = async () => {
       // Fetch saved layout first
-      let savedLayout: { nodes?: { id: string; position: { x: number; y: number } }[]; edges?: any[] } | null = null;
+      let savedLayout: SavedLayout | null = null;
       try {
         const res = await fetch('http://localhost:5000/api/layout');
         const layout = await res.json();
@@ -173,31 +335,12 @@ export default function App() {
 
         if (!isMounted) return;
 
-        // Create nodes from VM data
-        let newNodes = data.services.map((service: any, index: number) => ({
-          id: service.service,
-          position: { x: (index % 3) * 350, y: Math.floor(index / 3) * 300 },
-          data: {
-            service: service.service,
-            businessOwner: service.businessOwner,
-            status: service.vms.every((vm: any) => vm.status === 'running') ? 'healthy' : 'unhealthy',
-            vms: service.vms,
-          },
-          type: 'javaProcess',
-        }));
+        // Create nodes with groups
+        const newNodes = createNodesWithGroups(data.services, [], savedLayout || undefined);
 
-        // Restore saved layout positions
-        if (savedLayout) {
-          console.log('Restoring saved layout');
-          if (savedLayout.nodes) {
-            newNodes = newNodes.map((node: Node) => {
-              const savedNode = savedLayout!.nodes!.find(n => n.id === node.id);
-              return savedNode ? { ...node, position: savedNode.position } : node;
-            });
-          }
-          if (savedLayout.edges) {
-            setEdges(savedLayout.edges);
-          }
+        // Restore edges if saved
+        if (savedLayout?.edges) {
+          setEdges(savedLayout.edges);
         }
 
         setNodes(newNodes);
@@ -212,6 +355,7 @@ export default function App() {
           const metricsMap: Record<string, VmMetrics> = await metricsResponse.json();
           setNodes(currentNodes => {
             return currentNodes.map(node => {
+              if (node.type === 'group') return node;
               const vms = (node.data?.vms as VmInfo[]) || [];
               const updatedVms = vms.map(vm => {
                 const metrics = metricsMap[vm.ip];
@@ -237,22 +381,7 @@ export default function App() {
           if (!response.ok) return;
           const data = await response.json();
 
-          setNodes(currentNodes => {
-            return data.services.map((service: any, index: number) => {
-              const existingNode = currentNodes.find(n => n.id === service.service);
-              return {
-                id: service.service,
-                position: existingNode?.position ?? { x: (index % 3) * 350, y: Math.floor(index / 3) * 300 },
-                data: {
-                  service: service.service,
-                  businessOwner: service.businessOwner,
-                  status: service.vms.every((vm: any) => vm.status === 'running') ? 'healthy' : 'unhealthy',
-                  vms: service.vms,
-                },
-                type: 'javaProcess',
-              };
-            });
-          });
+          setNodes(currentNodes => createNodesWithGroups(data.services, currentNodes));
         } catch (error) {
           console.error('Failed to poll VM data:', error);
         }
@@ -267,6 +396,7 @@ export default function App() {
 
           setNodes(currentNodes => {
             return currentNodes.map(node => {
+              if (node.type === 'group') return node;
               const vms = (node.data?.vms as VmInfo[]) || [];
               const updatedVms = vms.map(vm => {
                 const metrics = metricsMap[vm.ip];
@@ -277,7 +407,7 @@ export default function App() {
           });
 
           setSelectedNode(current => {
-            if (!current) return null;
+            if (!current || current.type === 'group') return current;
             const vms = (current.data?.vms as VmInfo[]) || [];
             const updatedVms = vms.map(vm => {
               const metrics = metricsMap[vm.ip];
@@ -300,31 +430,43 @@ export default function App() {
     };
   }, []);
 
+  // Extract unique businessOwners from group nodes
+  const businessOwners = useMemo(() => {
+    return nodes
+      .filter(node => node.type === 'group')
+      .map(node => (node.data as GroupNodeData).businessOwner);
+  }, [nodes]);
+
   return (
-    <div className="react-flow-container">
-      {isLoading && <LoadingOverlay />}
-      <LayoutControls onSave={saveLayout} onReset={resetLayout} onRefresh={refreshData} />
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeClick={onNodeClick}
-        onPaneClick={onPaneClick}
-        nodeTypes={nodeTypes}
-        defaultEdgeOptions={{
-          animated: true,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-          },
-        }}
-        fitView
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
-      <Sidebar node={selectedNode} onClose={() => setSelectedNode(null)} />
-    </div>
+    <ReactFlowProvider>
+      <div className="react-flow-container">
+        {isLoading && <LoadingOverlay />}
+        <div className="top-nav">
+          <BusinessOwnerNav owners={businessOwners} />
+          <LayoutControls onSave={saveLayout} onReset={resetLayout} onRefresh={refreshData} />
+        </div>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={onNodeClick}
+          onPaneClick={onPaneClick}
+          nodeTypes={nodeTypes}
+          defaultEdgeOptions={{
+            animated: true,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+            },
+          }}
+          fitView
+        >
+          <Background />
+          <Controls />
+        </ReactFlow>
+        <Sidebar node={selectedNode} onClose={() => setSelectedNode(null)} />
+      </div>
+    </ReactFlowProvider>
   );
 }

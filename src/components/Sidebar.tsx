@@ -26,7 +26,10 @@ function getMetricColorClass(value: number | null): string {
 }
 
 export function Sidebar({ node, onClose }: SidebarProps) {
-  if (!node) return null;
+  // Only show when a node is selected
+  if (!node) {
+    return null;
+  }
 
   const config = node.type ? nodeConfig[node.type] : null;
   const title = config?.title || '节点详情';

@@ -1,4 +1,4 @@
-.layout-controls {
+.business-owner-nav {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -11,7 +11,18 @@
   padding: 6px 8px;
 }
 
-.layout-controls button {
+.business-owner-nav__title {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 10px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  margin-right: 4px;
+}
+
+.business-owner-nav__btn {
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 500;
@@ -25,17 +36,17 @@
   position: relative;
 }
 
-.layout-controls button:hover {
+.business-owner-nav__btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
-.layout-controls button:active {
+.business-owner-nav__btn:active {
   background: rgba(255, 255, 255, 0.15);
   transform: scale(0.97);
 }
 
-.layout-controls button::after {
+.business-owner-nav__btn::after {
   content: '';
   position: absolute;
   bottom: 2px;
@@ -48,27 +59,6 @@
   transition: width 0.2s ease;
 }
 
-.layout-controls button:hover::after {
+.business-owner-nav__btn:hover::after {
   width: 50%;
-}
-
-.layout-controls button.saved {
-  color: #4ade80;
-}
-
-.layout-controls button.error {
-  color: #f87171;
-}
-
-.layout-controls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.layout-controls button:disabled:hover {
-  background: transparent;
-}
-
-.layout-controls button:disabled::after {
-  display: none;
 }
