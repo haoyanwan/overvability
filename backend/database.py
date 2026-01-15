@@ -11,7 +11,7 @@ _db_lock = threading.Lock()
 _db = None
 
 
-def get_db() -> TinyDB:
+def get_db():
     """Get or create the TinyDB instance (thread-safe singleton)."""
     global _db
     if _db is None:
@@ -31,7 +31,7 @@ def get_metrics_table():
     return get_db().table("metrics")
 
 
-def save_vm_data(services_data: dict):
+def save_vm_data(services_data):
     """Save VM data to TinyDB, replacing any existing data."""
     table = get_vms_table()
     VmData = Query()
@@ -55,7 +55,7 @@ def read_vm_data():
     return result[0] if result else None
 
 
-def save_metrics_data(metrics_by_ip: dict):
+def save_metrics_data(metrics_by_ip):
     """Save metrics data to TinyDB, replacing any existing data."""
     table = get_metrics_table()
     MetricsData = Query()
