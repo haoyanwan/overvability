@@ -1,64 +1,70 @@
 .business-owner-nav {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 6px 8px;
-}
-
-.business-owner-nav__title {
-  font-size: 10px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 6px 10px;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  margin-right: 4px;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .business-owner-nav__btn {
-  padding: 8px 16px;
-  font-size: 12px;
+  width: 100%;
+  padding: 11px 16px 11px 20px;
+  font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
   position: relative;
+  overflow: hidden;
 }
 
-.business-owner-nav__btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.business-owner-nav__btn:active {
-  background: rgba(255, 255, 255, 0.15);
-  transform: scale(0.97);
+.business-owner-nav__btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  border-radius: 0 4px 4px 0;
+  transform: scaleY(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .business-owner-nav__btn::after {
   content: '';
   position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  border-radius: 1px;
-  transition: width 0.2s ease;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.business-owner-nav__btn:hover {
+  color: #fff;
+  padding-left: 24px;
+}
+
+.business-owner-nav__btn:hover::before {
+  transform: scaleY(1);
 }
 
 .business-owner-nav__btn:hover::after {
-  width: 50%;
+  opacity: 1;
+}
+
+.business-owner-nav__btn:active {
+  transform: scale(0.98);
+}
+
+.business-owner-nav__empty {
+  padding: 12px 20px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
 }

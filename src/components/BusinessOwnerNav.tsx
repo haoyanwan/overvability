@@ -19,11 +19,12 @@ export function BusinessOwnerNav({ owners }: BusinessOwnerNavProps) {
     }
   };
 
-  if (owners.length === 0) return null;
+  if (owners.length === 0) {
+    return <div className="business-owner-nav__empty">暂无业务方</div>;
+  }
 
   return (
     <div className="business-owner-nav">
-      <div className="business-owner-nav__title">业务方</div>
       {owners.map(owner => (
         <button
           key={owner}

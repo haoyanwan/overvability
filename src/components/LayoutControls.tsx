@@ -12,7 +12,7 @@ export function LayoutControls({ onSave, onReset, onRefresh }: LayoutControlsPro
   const [refreshStatus, setRefreshStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('color-mode');
-    return saved !== 'light'; // Default to dark mode
+    return saved !== 'light';
   });
 
   useEffect(() => {
@@ -49,18 +49,29 @@ export function LayoutControls({ onSave, onReset, onRefresh }: LayoutControlsPro
 
   return (
     <div className="layout-controls">
-      <button onClick={handleSave} className={saveStatus === 'saved' ? 'saved' : ''}>
+      <button
+        className={`layout-controls__btn ${saveStatus === 'saved' ? 'saved' : ''}`}
+        onClick={handleSave}
+      >
         {saveStatus === 'saved' ? '保存!' : '保存布局'}
       </button>
-      <button onClick={onReset}>重置布局</button>
       <button
+        className="layout-controls__btn"
+        onClick={onReset}
+      >
+        重置布局
+      </button>
+      <button
+        className={`layout-controls__btn ${refreshStatus === 'done' ? 'saved' : refreshStatus === 'error' ? 'error' : ''}`}
         onClick={handleRefresh}
         disabled={refreshStatus === 'loading'}
-        className={refreshStatus === 'done' ? 'saved' : refreshStatus === 'error' ? 'error' : ''}
       >
         {getRefreshButtonText()}
       </button>
-      <button onClick={() => setIsDark(!isDark)}>
+      <button
+        className="layout-controls__btn"
+        onClick={() => setIsDark(!isDark)}
+      >
         {isDark ? '浅色模式' : '深色模式'}
       </button>
     </div>
