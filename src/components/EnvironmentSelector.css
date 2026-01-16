@@ -1,0 +1,62 @@
+.environment-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.environment-selector__button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.environment-selector__button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.environment-selector__button--active {
+  background: var(--env-bg);
+  border-color: var(--env-color);
+  box-shadow: 0 0 12px rgba(var(--env-color), 0.15);
+}
+
+.environment-selector__button--active:hover {
+  background: var(--env-bg);
+}
+
+.environment-selector__indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.environment-selector__button--active .environment-selector__indicator {
+  background: var(--env-color);
+  box-shadow: 0 0 8px var(--env-color);
+}
+
+.environment-selector__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s ease;
+}
+
+.environment-selector__button:hover .environment-selector__label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.environment-selector__button--active .environment-selector__label {
+  color: var(--env-color);
+  font-weight: 600;
+}

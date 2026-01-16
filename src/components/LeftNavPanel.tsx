@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BusinessOwnerNav } from './BusinessOwnerNav';
 import { LayoutControls } from './LayoutControls';
+import { EnvironmentSelector } from './EnvironmentSelector';
 import './LeftNavPanel.css';
 
 interface LeftNavPanelProps {
@@ -11,6 +12,7 @@ interface LeftNavPanelProps {
 }
 
 export function LeftNavPanel({ owners, onSave, onReset, onRefresh }: LeftNavPanelProps) {
+  const [environmentOpen, setEnvironmentOpen] = useState(true);
   const [businessOwnerOpen, setBusinessOwnerOpen] = useState(true);
   const [layoutControlsOpen, setLayoutControlsOpen] = useState(true);
 
@@ -18,6 +20,24 @@ export function LeftNavPanel({ owners, onSave, onReset, onRefresh }: LeftNavPane
     <div className="left-nav-panel">
       <div className="left-nav-panel__header">
         <span className="left-nav-panel__title">导航</span>
+      </div>
+
+      {/* Environment Section */}
+      <div className="left-nav-panel__section">
+        <button
+          className="left-nav-panel__section-header"
+          onClick={() => setEnvironmentOpen(!environmentOpen)}
+        >
+          <span className="left-nav-panel__section-icon">
+            {environmentOpen ? '▼' : '▶'}
+          </span>
+          <span>环境</span>
+        </button>
+        {environmentOpen && (
+          <div className="left-nav-panel__section-content">
+            <EnvironmentSelector />
+          </div>
+        )}
       </div>
 
       {/* Business Owner Section */}

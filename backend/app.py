@@ -11,7 +11,20 @@ from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.subscription import SubscriptionClient
 from prometheus_service import prometheus_service
-from database import save_vm_data, read_vm_data, save_metrics_data, read_metrics_data, get_all_vm_ips
+from database import (
+    save_vm_data,
+    read_vm_data,
+    save_metrics_data,
+    read_metrics_data,
+    get_all_vm_ips,
+    get_layout_path,
+)
+from environment_config import (
+    VALID_ENVIRONMENTS,
+    DEFAULT_ENVIRONMENT,
+    filter_services_by_environment,
+    is_valid_environment,
+)
 
 load_dotenv()
 
@@ -22,7 +35,11 @@ VM_DATA_INTERVAL = 30 * 60  # 30 minutes for Azure VM data
 METRICS_INTERVAL = int(
     os.getenv("METRICS_INTERVAL", "30")
 )  # seconds for Prometheus metrics
-LAYOUT_FILE = os.path.join(os.path.dirname(__file__), "layout.json")
+
+
+def validate_env(env: str) -> str:
+    """Validate and return environment, defaulting if invalid."""
+    return env if is_valid_environment(env) else DEFAULT_ENVIRONMENT
 
 
 def get_credential():
@@ -33,8 +50,8 @@ def get_credential():
     )
 
 
-def fetch_vm_data():
-    """Fetch VM data from Azure and return as dict."""
+def fetch_all_vm_data():
+    """Fetch all VM data from Azure and return as dict."""
     credential = get_credential()
     subscription_client = SubscriptionClient(credential)
     services = {}
@@ -107,64 +124,122 @@ def fetch_vm_data():
                     if private_ip:
                         break
 
-            if service_name not in services:
-                services[service_name] = {
-                    "service": service_name,
-                    "businessOwner": tags.get("proj", ""),
-                    "resourceGroup": resource_group,
-                    "location": vm.location,
-                    "vms": [],
-                }
+            # Split service names containing "/" into separate services
+            # e.g., "nacos/gateway" becomes two services: "nacos" and "gateway"
+            service_names = [s.strip() for s in service_name.split("/") if s.strip()]
 
-            services[service_name]["vms"].append(
-                {
-                    "name": vm.name,
-                    "ip": private_ip,
-                    "coreCount": size_info.get("cores", 0),
-                    "memory": f"{size_info.get('memory_gb', 0)}GB",
-                    "os": os_info,
-                    "status": status,
-                }
-            )
+            vm_info = {
+                "name": vm.name,
+                "ip": private_ip,
+                "coreCount": size_info.get("cores", 0),
+                "memory": f"{size_info.get('memory_gb', 0)}GB",
+                "os": os_info,
+                "status": status,
+                "subscriptionId": sub.subscription_id,
+                "resourceGroup": resource_group,
+            }
+
+            for svc_name in service_names:
+                if svc_name not in services:
+                    services[svc_name] = {
+                        "service": svc_name,
+                        "businessOwner": tags.get("proj", ""),
+                        "resourceGroup": resource_group,
+                        "location": vm.location,
+                        "vms": [],
+                    }
+                services[svc_name]["vms"].append(vm_info.copy())
 
     return {"services": list(services.values())}
 
 
 def background_vm_fetch():
-    """Background thread that fetches VM data from Azure and writes to TinyDB."""
+    """Background thread that fetches VM data and distributes to all environments."""
     while True:
         try:
-            data = fetch_vm_data()
-            save_vm_data(data)
-            print(f"[VM Sync] Updated VM data at {datetime.utcnow().isoformat()}")
+            all_data = fetch_all_vm_data()
+            for env in VALID_ENVIRONMENTS:
+                filtered = filter_services_by_environment(
+                    all_data.get("services", []), env
+                )
+                save_vm_data({"services": filtered}, env)
+            print(
+                f"[VM Sync] Updated VM data for all environments at {datetime.utcnow().isoformat()}"
+            )
         except Exception as e:
             print(f"[VM Sync] Error: {e}")
         time.sleep(VM_DATA_INTERVAL)
 
 
 def background_metrics_fetch():
-    """Background thread that fetches metrics from Prometheus and writes to TinyDB."""
+    """Background thread that fetches metrics for all environments."""
     while True:
         try:
-            ips = get_all_vm_ips()
-            if ips:
-                metrics = prometheus_service.get_bulk_metrics(ips)
-                save_metrics_data(metrics)
-                print(f"[Metrics Sync] Updated metrics for {len(ips)} VMs")
+            for env in VALID_ENVIRONMENTS:
+                ips = get_all_vm_ips(env)
+                if ips:
+                    metrics = prometheus_service.get_bulk_metrics(ips)
+                    save_metrics_data(metrics, env)
+                    print(f"[Metrics Sync] Updated metrics for {len(ips)} VMs in {env}")
         except Exception as e:
             print(f"[Metrics Sync] Error: {e}")
         time.sleep(METRICS_INTERVAL)
 
 
-@app.route("/api/vms")
-def get_vms():
-    """Get VM data from TinyDB cache."""
-    data = read_vm_data()
+# Environment-aware API endpoints
+@app.route("/api/<env>/vms")
+def get_vms(env: str):
+    """Get VM data for specific environment."""
+    env = validate_env(env)
+    data = read_vm_data(env)
     if data:
-        return jsonify({"services": data.get("services", [])})
-    return jsonify({"services": [], "error": "No data available yet"})
+        return jsonify({"services": data.get("services", []), "environment": env})
+    return jsonify({"services": [], "environment": env, "error": "No data available yet"})
 
 
+@app.route("/api/<env>/metrics")
+def get_metrics(env: str):
+    """Get metrics for specific environment."""
+    env = validate_env(env)
+    data = read_metrics_data(env)
+    if data:
+        return jsonify(data.get("metrics_by_ip", {}))
+    return jsonify({})
+
+
+@app.route("/api/<env>/layout", methods=["GET"])
+def get_layout(env: str):
+    """Get saved layout for specific environment."""
+    env = validate_env(env)
+    layout_file = get_layout_path(env)
+    if os.path.exists(layout_file):
+        with open(layout_file, "r") as f:
+            return jsonify(json.load(f))
+    return jsonify({})
+
+
+@app.route("/api/<env>/layout", methods=["POST"])
+def save_layout(env: str):
+    """Save layout for specific environment."""
+    env = validate_env(env)
+    layout_file = get_layout_path(env)
+    data = request.get_json()
+    with open(layout_file, "w") as f:
+        json.dump(data, f)
+    return jsonify({"success": True, "environment": env})
+
+
+@app.route("/api/<env>/layout", methods=["DELETE"])
+def delete_layout(env: str):
+    """Delete saved layout for specific environment."""
+    env = validate_env(env)
+    layout_file = get_layout_path(env)
+    if os.path.exists(layout_file):
+        os.remove(layout_file)
+    return jsonify({"success": True, "environment": env})
+
+
+# Environment-agnostic endpoints
 @app.route("/api/prometheus/status")
 def prometheus_status():
     """Check Prometheus availability."""
@@ -176,48 +251,26 @@ def prometheus_status():
     )
 
 
-@app.route("/api/metrics")
-def get_metrics():
-    """Get all metrics from TinyDB cache."""
-    data = read_metrics_data()
-    if data:
-        return jsonify(data.get("metrics_by_ip", {}))
-    return jsonify({})
-
-
-@app.route("/api/layout", methods=["GET"])
-def get_layout():
-    """Get saved layout."""
-    if os.path.exists(LAYOUT_FILE):
-        with open(LAYOUT_FILE, "r") as f:
-            return jsonify(json.load(f))
-    return jsonify({})
-
-
-@app.route("/api/layout", methods=["POST"])
-def save_layout():
-    """Save layout."""
-    data = request.get_json()
-    with open(LAYOUT_FILE, "w") as f:
-        json.dump(data, f)
-    return jsonify({"success": True})
-
-
-@app.route("/api/layout", methods=["DELETE"])
-def delete_layout():
-    """Delete saved layout."""
-    if os.path.exists(LAYOUT_FILE):
-        os.remove(LAYOUT_FILE)
-    return jsonify({"success": True})
+@app.route("/api/environments")
+def list_environments():
+    """List available environments."""
+    return jsonify(
+        {
+            "environments": VALID_ENVIRONMENTS,
+            "default": DEFAULT_ENVIRONMENT,
+        }
+    )
 
 
 if __name__ == "__main__":
-    # Run initial VM fetch to populate database
-    print("[Startup] Fetching initial VM data...")
+    # Run initial VM fetch and distribute to all environments
+    print("[Startup] Fetching initial VM data for all environments...")
     try:
-        data = fetch_vm_data()
-        save_vm_data(data)
-        print("[Startup] Initial VM data saved to TinyDB")
+        all_data = fetch_all_vm_data()
+        for env in VALID_ENVIRONMENTS:
+            filtered = filter_services_by_environment(all_data.get("services", []), env)
+            save_vm_data({"services": filtered}, env)
+            print(f"[Startup] Initial VM data saved for {env}")
     except Exception as e:
         print(f"[Startup] Initial VM fetch failed: {e}")
 

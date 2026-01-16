@@ -3,37 +3,52 @@ import threading
 from datetime import datetime
 from tinydb import TinyDB, Query
 
-# Database file location (same directory as this file)
-DB_FILE = os.path.join(os.path.dirname(__file__), "data.json")
+from environment_config import VALID_ENVIRONMENTS, DEFAULT_ENVIRONMENT
 
-# Thread-safe singleton pattern
+# Thread-safe database instances per environment
 _db_lock = threading.Lock()
-_db = None
+_db_instances: dict = {}
 
 
-def get_db():
-    """Get or create the TinyDB instance (thread-safe singleton)."""
-    global _db
-    if _db is None:
+def get_db_path(env: str) -> str:
+    """Get database file path for specific environment."""
+    if env not in VALID_ENVIRONMENTS:
+        env = DEFAULT_ENVIRONMENT
+    return os.path.join(os.path.dirname(__file__), f"data_{env}.json")
+
+
+def get_layout_path(env: str) -> str:
+    """Get layout file path for specific environment."""
+    if env not in VALID_ENVIRONMENTS:
+        env = DEFAULT_ENVIRONMENT
+    return os.path.join(os.path.dirname(__file__), f"layout_{env}.json")
+
+
+def get_db(env: str) -> TinyDB:
+    """Get or create the TinyDB instance for specific environment (thread-safe)."""
+    if env not in VALID_ENVIRONMENTS:
+        env = DEFAULT_ENVIRONMENT
+
+    if env not in _db_instances:
         with _db_lock:
-            if _db is None:
-                _db = TinyDB(DB_FILE)
-    return _db
+            if env not in _db_instances:
+                _db_instances[env] = TinyDB(get_db_path(env))
+    return _db_instances[env]
 
 
-def get_vms_table():
-    """Get the VMs table."""
-    return get_db().table("vms")
+def get_vms_table(env: str):
+    """Get the VMs table for specific environment."""
+    return get_db(env).table("vms")
 
 
-def get_metrics_table():
-    """Get the metrics table."""
-    return get_db().table("metrics")
+def get_metrics_table(env: str):
+    """Get the metrics table for specific environment."""
+    return get_db(env).table("metrics")
 
 
-def save_vm_data(services_data):
-    """Save VM data to TinyDB, replacing any existing data."""
-    table = get_vms_table()
+def save_vm_data(services_data, env: str):
+    """Save VM data to TinyDB for specific environment."""
+    table = get_vms_table(env)
     VmData = Query()
 
     record = {
@@ -42,22 +57,21 @@ def save_vm_data(services_data):
         "last_updated": datetime.utcnow().isoformat() + "Z",
     }
 
-    # Upsert - replace existing or insert new
     table.upsert(record, VmData.type == "vm_data")
 
 
-def read_vm_data():
-    """Read VM data from TinyDB."""
-    table = get_vms_table()
+def read_vm_data(env: str):
+    """Read VM data from TinyDB for specific environment."""
+    table = get_vms_table(env)
     VmData = Query()
 
     result = table.search(VmData.type == "vm_data")
     return result[0] if result else None
 
 
-def save_metrics_data(metrics_by_ip):
-    """Save metrics data to TinyDB, replacing any existing data."""
-    table = get_metrics_table()
+def save_metrics_data(metrics_by_ip, env: str):
+    """Save metrics data to TinyDB for specific environment."""
+    table = get_metrics_table(env)
     MetricsData = Query()
 
     record = {
@@ -69,18 +83,18 @@ def save_metrics_data(metrics_by_ip):
     table.upsert(record, MetricsData.type == "metrics_data")
 
 
-def read_metrics_data():
-    """Read metrics data from TinyDB."""
-    table = get_metrics_table()
+def read_metrics_data(env: str):
+    """Read metrics data from TinyDB for specific environment."""
+    table = get_metrics_table(env)
     MetricsData = Query()
 
     result = table.search(MetricsData.type == "metrics_data")
     return result[0] if result else None
 
 
-def get_all_vm_ips():
-    """Extract all VM IPs from stored VM data."""
-    vm_data = read_vm_data()
+def get_all_vm_ips(env: str):
+    """Extract all VM IPs from stored VM data for specific environment."""
+    vm_data = read_vm_data(env)
     if not vm_data:
         return []
 

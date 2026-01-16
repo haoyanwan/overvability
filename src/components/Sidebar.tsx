@@ -1,5 +1,5 @@
 import type { Node } from '@xyflow/react';
-import { javaProcessLabels, vmLabels, vmMetricsLabels, type VmInfo } from '../types/nodes';
+import { javaProcessLabels, vmLabels, vmMetricsLabels, getAzurePortalVmUrl, type VmInfo } from '../types/nodes';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -59,12 +59,28 @@ export function Sidebar({ node, onClose }: SidebarProps) {
             <label className="sidebar-vms-title">虚拟机 ({vms.length})</label>
             {vms.map((vm, index) => (
               <div key={index} className="sidebar-vm">
-                {Object.entries(vmLabels).map(([key, label]) => (
-                  <div key={key} className="sidebar-vm-field">
-                    <span className="sidebar-vm-label">{label}</span>
-                    <span className="sidebar-vm-value">{String(vm[key as keyof VmInfo])}</span>
-                  </div>
-                ))}
+                {Object.entries(vmLabels).map(([key, label]) => {
+                  const value = vm[key as keyof VmInfo];
+                  const azureUrl = key === 'ip' ? getAzurePortalVmUrl(vm) : null;
+
+                  return (
+                    <div key={key} className="sidebar-vm-field">
+                      <span className="sidebar-vm-label">{label}</span>
+                      {azureUrl ? (
+                        <a
+                          href={azureUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sidebar-vm-value sidebar-vm-link"
+                        >
+                          {String(value)}
+                        </a>
+                      ) : (
+                        <span className="sidebar-vm-value">{String(value)}</span>
+                      )}
+                    </div>
+                  );
+                })}
 
                 {/* Metrics section */}
                 {vm.metrics && (

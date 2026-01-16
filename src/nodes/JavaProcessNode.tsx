@@ -51,9 +51,11 @@ function formatMetric(value: number | null): string {
 }
 
 export function JavaProcessNode({ data, selected }: JavaProcessNodeProps) {
-    const status = data.status || 'healthy';
-    const vmCount = data.vms?.length || 0;
-    const metrics = getAggregatedMetrics(data.vms || []);
+    const vms = data.vms || [];
+    const vmCount = vms.length;
+    const onlineCount = vms.filter(vm => vm.status === 'running').length;
+    const status = vmCount > 0 && onlineCount === vmCount ? 'healthy' : 'unhealthy';
+    const metrics = getAggregatedMetrics(vms);
 
     return (
         <div className={`service-node service-node--${status}${selected ? ' selected' : ''}`}>
@@ -70,7 +72,10 @@ export function JavaProcessNode({ data, selected }: JavaProcessNodeProps) {
                     <div className="service-node__service">{data.service}</div>
                     <div className="service-node__meta">
                         <span className="service-node__owner">{data.businessOwner}</span>
-                        <span className="service-node__vms">{vmCount} 台虚拟机</span>
+                        <span className="service-node__env">{data.environment}</span>
+                    </div>
+                    <div className="service-node__meta">
+                        <span className="service-node__vms">{onlineCount}/{vmCount} 台虚拟机</span>
                     </div>
                 </div>
             </div>

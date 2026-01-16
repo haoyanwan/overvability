@@ -1,13 +1,14 @@
 import { ReactFlow, ReactFlowProvider, Background, Controls, applyEdgeChanges, applyNodeChanges, addEdge, MarkerType, type Node } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './App.css';
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { JavaProcessNode } from './nodes/JavaProcessNode';
 import { GroupNode } from './nodes/GroupNode';
 import { Sidebar } from './components/Sidebar';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { LeftNavPanel } from './components/LeftNavPanel';
-import type { VmMetrics, VmInfo, GroupNodeData } from './types/nodes';
+import { useEnvironment } from './context/EnvironmentContext';
+import { getEnvironment, type VmMetrics, type VmInfo, type GroupNodeData } from './types/nodes';
 
 const nodeTypes = {
   javaProcess: JavaProcessNode,
@@ -69,6 +70,8 @@ function createNodesWithGroups(services: any[], savedLayout?: SavedLayout): Node
         data: {
           service: service.service,
           businessOwner: service.businessOwner,
+          resourceGroup: service.resourceGroup || '',
+          environment: getEnvironment(service.resourceGroup || ''),
           status: service.vms.every((vm: any) => vm.status === 'running') ? 'healthy' : 'unhealthy',
           vms: service.vms,
         },
@@ -93,10 +96,12 @@ function applyMetricsToNodes(nodes: Node[], metricsMap: Record<string, VmMetrics
 }
 
 export default function App() {
+  const { environment } = useEnvironment();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<{ id: string; source: string; target: string }[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const prevEnvironmentRef = useRef(environment);
 
   const onNodesChange = useCallback(
     (changes: any) => setNodes(nds => applyNodeChanges(changes, nds)),
@@ -133,16 +138,16 @@ export default function App() {
       })),
       edges,
     };
-    await fetch(`${API_BASE}/api/layout`, {
+    await fetch(`${API_BASE}/api/${environment}/layout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(layout),
     });
-  }, [nodes, edges]);
+  }, [nodes, edges, environment]);
 
   const resetLayout = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/layout`);
+      const res = await fetch(`${API_BASE}/api/${environment}/layout`);
       const savedLayout: SavedLayout = await res.json();
 
       if (savedLayout.nodes) {
@@ -164,11 +169,11 @@ export default function App() {
     } catch (error) {
       console.error('Failed to load saved layout:', error);
     }
-  }, []);
+  }, [environment]);
 
   const fetchMetrics = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/metrics`);
+      const response = await fetch(`${API_BASE}/api/${environment}/metrics`);
       if (!response.ok) return;
       const metricsMap: Record<string, VmMetrics> = await response.json();
 
@@ -182,13 +187,13 @@ export default function App() {
     } catch (error) {
       console.error('Failed to fetch metrics:', error);
     }
-  }, []);
+  }, [environment]);
 
   const refreshData = useCallback(async () => {
     try {
       const [layoutRes, vmsRes] = await Promise.all([
-        fetch(`${API_BASE}/api/layout`),
-        fetch(`${API_BASE}/api/vms`),
+        fetch(`${API_BASE}/api/${environment}/layout`),
+        fetch(`${API_BASE}/api/${environment}/vms`),
       ]);
 
       const savedLayout: SavedLayout = layoutRes.ok ? await layoutRes.json() : {};
@@ -203,19 +208,29 @@ export default function App() {
     } catch (error) {
       console.error('Failed to refresh data:', error);
     }
-  }, [fetchMetrics]);
+  }, [fetchMetrics, environment]);
 
+  // Initialize and poll data
   useEffect(() => {
     let vmPollTimer: ReturnType<typeof setInterval> | null = null;
     let metricsPollTimer: ReturnType<typeof setInterval> | null = null;
     let isMounted = true;
 
     const init = async () => {
+      // Reset state when environment changes
+      if (prevEnvironmentRef.current !== environment) {
+        setNodes([]);
+        setEdges([]);
+        setSelectedNode(null);
+        setIsLoading(true);
+        prevEnvironmentRef.current = environment;
+      }
+
       try {
         const [layoutRes, vmsRes, metricsRes] = await Promise.all([
-          fetch(`${API_BASE}/api/layout`),
-          fetch(`${API_BASE}/api/vms`),
-          fetch(`${API_BASE}/api/metrics`),
+          fetch(`${API_BASE}/api/${environment}/layout`),
+          fetch(`${API_BASE}/api/${environment}/vms`),
+          fetch(`${API_BASE}/api/${environment}/metrics`),
         ]);
 
         if (!isMounted) return;
@@ -241,8 +256,8 @@ export default function App() {
         if (!isMounted) return;
         try {
           const [layoutRes, vmsRes] = await Promise.all([
-            fetch(`${API_BASE}/api/layout`),
-            fetch(`${API_BASE}/api/vms`),
+            fetch(`${API_BASE}/api/${environment}/layout`),
+            fetch(`${API_BASE}/api/${environment}/vms`),
           ]);
           const savedLayout: SavedLayout = layoutRes.ok ? await layoutRes.json() : {};
           const vmsData = vmsRes.ok ? await vmsRes.json() : { services: [] };
@@ -255,7 +270,7 @@ export default function App() {
       metricsPollTimer = setInterval(async () => {
         if (!isMounted) return;
         try {
-          const response = await fetch(`${API_BASE}/api/metrics`);
+          const response = await fetch(`${API_BASE}/api/${environment}/metrics`);
           if (!response.ok) return;
           const metricsMap: Record<string, VmMetrics> = await response.json();
           setNodes(currentNodes => applyMetricsToNodes(currentNodes, metricsMap));
@@ -278,7 +293,7 @@ export default function App() {
       if (vmPollTimer) clearInterval(vmPollTimer);
       if (metricsPollTimer) clearInterval(metricsPollTimer);
     };
-  }, []);
+  }, [environment]);
 
   const businessOwners = useMemo(() => {
     return nodes

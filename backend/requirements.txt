@@ -5,5 +5,5 @@ azure-identity
 azure-mgmt-compute
 azure-mgmt-network
 azure-mgmt-subscription
-prometheus-api-client
+prometheus-api-client==0.5.3
 tinydb

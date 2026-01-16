@@ -157,6 +157,18 @@
   font-weight: 500;
 }
 
+.sidebar-vm-link {
+  color: #3b82f6;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.sidebar-vm-link:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
 /* VM Metrics section */
 .sidebar-vm-metrics {
   margin-top: 10px;
