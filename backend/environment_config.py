@@ -23,16 +23,26 @@ def get_environment_for_resource_group(resource_group: str) -> str:
 
 
 def filter_services_by_environment(services: list, env: str) -> list:
-    """Filter services list to only include those matching the environment."""
+    """Filter services list to only include VMs matching the environment."""
     if env not in VALID_ENVIRONMENTS:
         env = DEFAULT_ENVIRONMENT
 
     filtered = []
     for service in services:
-        resource_group = service.get('resourceGroup', '')
-        service_env = get_environment_for_resource_group(resource_group)
-        if service_env == env:
-            filtered.append(service)
+        # Filter VMs within this service by their individual resourceGroup
+        filtered_vms = [
+            vm for vm in service.get('vms', [])
+            if get_environment_for_resource_group(vm.get('resourceGroup', '')) == env
+        ]
+
+        # Only include service if it has VMs in this environment
+        if filtered_vms:
+            filtered_service = service.copy()
+            filtered_service['vms'] = filtered_vms
+            # Update service resourceGroup to match the filtered VMs
+            filtered_service['resourceGroup'] = filtered_vms[0].get('resourceGroup', '')
+            filtered.append(filtered_service)
+
     return filtered
 
 
