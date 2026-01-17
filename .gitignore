@@ -24,10 +24,6 @@ __pycache__/
 .env
 backend/.env
 
-# TinyDB data (runtime generated)
-backend/data.json
-backend/data_*.json
-
 # Layout state (user-specific)
 backend/layout.json
 backend/layout_*.json
