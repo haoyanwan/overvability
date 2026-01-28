@@ -1,9 +1,10 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-
-export type Environment = 'fra' | 'dev' | 'release';
-
-export const VALID_ENVIRONMENTS: Environment[] = ['fra', 'dev', 'release'];
-export const DEFAULT_ENVIRONMENT: Environment = 'dev';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import {
+  type Environment,
+  VALID_ENVIRONMENTS,
+  DEFAULT_ENVIRONMENT,
+  isValidEnvironment,
+} from '../types';
 
 interface EnvironmentContextValue {
   environment: Environment;
@@ -12,10 +13,6 @@ interface EnvironmentContextValue {
 }
 
 const EnvironmentContext = createContext<EnvironmentContextValue | null>(null);
-
-function isValidEnvironment(env: string): env is Environment {
-  return VALID_ENVIRONMENTS.includes(env as Environment);
-}
 
 function getEnvironmentFromUrl(): Environment {
   const params = new URLSearchParams(window.location.search);
@@ -86,3 +83,7 @@ export function useEnvironment(): EnvironmentContextValue {
   }
   return context;
 }
+
+// Re-export types for convenience
+export type { Environment };
+export { VALID_ENVIRONMENTS, DEFAULT_ENVIRONMENT };

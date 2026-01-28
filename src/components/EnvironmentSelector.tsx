@@ -1,5 +1,5 @@
 import { useEnvironment, VALID_ENVIRONMENTS } from '../context/EnvironmentContext';
-import { environmentColors } from '../types/nodes';
+import { environmentColors } from '../types';
 import './EnvironmentSelector.css';
 
 export function EnvironmentSelector() {

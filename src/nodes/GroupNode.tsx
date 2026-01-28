@@ -1,11 +1,7 @@
 import { memo } from 'react';
-import { NodeResizer, type NodeProps } from '@xyflow/react';
-import type { GroupNodeData } from '../types/nodes';
+import { NodeResizer } from '@xyflow/react';
+import type { GroupNodeProps } from './types';
 import './GroupNode.css';
-
-interface GroupNodeProps extends NodeProps {
-  data: GroupNodeData;
-}
 
 export const GroupNode = memo(function GroupNode({ data, selected }: GroupNodeProps) {
   return (

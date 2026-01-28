@@ -1,16 +1,12 @@
 import type { Node } from '@xyflow/react';
-import { javaProcessLabels, vmLabels, vmMetricsLabels, getAzurePortalVmUrl, type VmInfo } from '../types/nodes';
+import { nodeConfigs } from '../nodes';
+import { vmLabels, vmMetricsLabels, getAzurePortalVmUrl, type VmInfo, type NodeType } from '../types';
 import './Sidebar.css';
 
 interface SidebarProps {
   node: Node | null;
   onClose: () => void;
 }
-
-// Map node types to their labels and titles
-const nodeConfig: Record<string, { title: string; labels: Record<string, string> }> = {
-  javaProcess: { title: '服务详情', labels: javaProcessLabels },
-};
 
 // Format metric value with percentage
 function formatMetric(value: number | null): string {
@@ -31,7 +27,7 @@ export function Sidebar({ node, onClose }: SidebarProps) {
     return null;
   }
 
-  const config = node.type ? nodeConfig[node.type] : null;
+  const config = node.type ? nodeConfigs[node.type as NodeType] : null;
   const title = config?.title || '节点详情';
   const labels = config?.labels || {};
   const vms = (node.data?.vms as VmInfo[]) || [];

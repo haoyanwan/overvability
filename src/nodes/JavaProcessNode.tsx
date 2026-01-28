@@ -1,11 +1,7 @@
 import { Handle, Position } from '@xyflow/react';
-import type { JavaProcessNodeData, VmInfo } from '../types/nodes';
+import type { VmInfo } from '../types';
+import type { JavaProcessNodeProps } from './types';
 import './JavaProcessNode.css';
-
-interface JavaProcessNodeProps {
-    data: JavaProcessNodeData;
-    selected?: boolean;
-}
 
 // Calculate aggregated metrics across all VMs in the service
 function getAggregatedMetrics(vms: VmInfo[]) {
@@ -30,10 +26,10 @@ function getAggregatedMetrics(vms: VmInfo[]) {
 
     return {
         cpuPeak: max(cpuPeaks),
-        cpuAvg: avg(cpuAvgs),
+        cpuAvg: max(cpuAvgs),
         memPeak: max(memPeaks),
-        memAvg: avg(memAvgs),
-        storageAvg: avg(storages),
+        memAvg: max(memAvgs),
+        storageAvg: max(storages),
     };
 }
 

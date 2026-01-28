@@ -2,30 +2,28 @@ import { ReactFlow, ReactFlowProvider, Background, Controls, applyEdgeChanges, a
 import '@xyflow/react/dist/style.css';
 import './App.css';
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { JavaProcessNode } from './nodes/JavaProcessNode';
-import { GroupNode } from './nodes/GroupNode';
 import { Sidebar } from './components/Sidebar';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { LeftNavPanel } from './components/LeftNavPanel';
 import { useEnvironment } from './context/EnvironmentContext';
-import { getEnvironment, type VmMetrics, type VmInfo, type GroupNodeData } from './types/nodes';
-
-const nodeTypes = {
-  javaProcess: JavaProcessNode,
-  group: GroupNode,
-};
+import { nodeComponents } from './nodes';
+import {
+  NODE_TYPES,
+  isGroupNode,
+  getEnvironment,
+  type VmMetrics,
+  type VmInfo,
+  type GroupNodeData,
+  type SavedLayout,
+  type ServiceFromApi,
+} from './types';
 
 const API_BASE = '';
 const VM_POLL_INTERVAL = 30 * 60 * 1000;
 const METRICS_POLL_INTERVAL = 30 * 1000;
 
-interface SavedLayout {
-  nodes?: { id: string; position: { x: number; y: number }; width?: number; height?: number }[];
-  edges?: { id: string; source: string; target: string }[];
-}
-
-function createNodesWithGroups(services: any[], savedLayout?: SavedLayout): Node[] {
-  const servicesByOwner: Record<string, any[]> = {};
+function createNodesWithGroups(services: ServiceFromApi[], savedLayout?: SavedLayout): Node[] {
+  const servicesByOwner: Record<string, ServiceFromApi[]> = {};
   for (const service of services) {
     const owner = service.businessOwner || 'default';
     if (!servicesByOwner[owner]) {
@@ -35,15 +33,17 @@ function createNodesWithGroups(services: any[], savedLayout?: SavedLayout): Node
   }
 
   const allNodes: Node[] = [];
-
+  // loop through for each owner group 
   for (const owner of Object.keys(servicesByOwner)) {
+    // get the services under this owner
     const ownerServices = servicesByOwner[owner];
     const groupId = `group-${owner}`;
     const savedGroup = savedLayout?.nodes?.find(n => n.id === groupId);
 
+    // creates the group node
     allNodes.push({
       id: groupId,
-      type: 'group',
+      type: NODE_TYPES.GROUP,
       position: savedGroup?.position || { x: 0, y: 0 },
       data: {
         businessOwner: owner,
@@ -57,13 +57,14 @@ function createNodesWithGroups(services: any[], savedLayout?: SavedLayout): Node
       draggable: true,
     });
 
+    // creates service nodes within the group
     for (const service of ownerServices) {
       const nodeId = service.service;
       const savedNode = savedLayout?.nodes?.find(n => n.id === nodeId);
 
       allNodes.push({
         id: nodeId,
-        type: 'javaProcess',
+        type: NODE_TYPES.JAVA_PROCESS,
         position: savedNode?.position || { x: 0, y: 0 },
         parentId: groupId,
         extent: 'parent',
@@ -72,7 +73,7 @@ function createNodesWithGroups(services: any[], savedLayout?: SavedLayout): Node
           businessOwner: service.businessOwner,
           resourceGroup: service.resourceGroup || '',
           environment: getEnvironment(service.resourceGroup || ''),
-          status: service.vms.every((vm: any) => vm.status === 'running') ? 'healthy' : 'unhealthy',
+          status: service.vms.every(vm => vm.status === 'running') ? 'healthy' : 'unhealthy',
           vms: service.vms,
         },
         draggable: true,
@@ -85,13 +86,24 @@ function createNodesWithGroups(services: any[], savedLayout?: SavedLayout): Node
 
 function applyMetricsToNodes(nodes: Node[], metricsMap: Record<string, VmMetrics>): Node[] {
   return nodes.map(node => {
-    if (node.type === 'group') return node;
+    // Group nodes don't have VMs, skip them
+    if (isGroupNode(node.type)) {
+      return node;
+    }
+
     const vms = (node.data?.vms as VmInfo[]) || [];
-    const updatedVms = vms.map(vm => {
-      const metrics = metricsMap[vm.ip];
-      return metrics ? { ...vm, metrics } : vm;
+    const vmsWithMetrics = vms.map(vm => {
+      const metricsForVm = metricsMap[vm.ip];
+      if (!metricsForVm) {
+        return vm;
+      }
+      return { ...vm, metrics: metricsForVm };
     });
-    return { ...node, data: { ...node.data, vms: updatedVms } };
+
+    return {
+      ...node,
+      data: { ...node.data, vms: vmsWithMetrics },
+    };
   });
 }
 
@@ -119,7 +131,7 @@ export default function App() {
   );
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
-    if (node.type !== 'group') {
+    if (!isGroupNode(node.type)) {
       setSelectedNode(node);
     }
   }, []);
@@ -131,7 +143,7 @@ export default function App() {
       nodes: nodes.map(node => ({
         id: node.id,
         position: node.position,
-        ...(node.type === 'group' ? {
+        ...(isGroupNode(node.type) ? {
           width: node.measured?.width ?? node.width ?? node.style?.width,
           height: node.measured?.height ?? node.height ?? node.style?.height,
         } : {}),
@@ -157,7 +169,7 @@ export default function App() {
           return {
             ...node,
             position: saved.position,
-            ...(node.type === 'group' && saved.width && saved.height ? {
+            ...(isGroupNode(node.type) && saved.width && saved.height ? {
               style: { ...node.style, width: saved.width, height: saved.height },
             } : {}),
           };
@@ -179,7 +191,7 @@ export default function App() {
 
       setNodes(currentNodes => applyMetricsToNodes(currentNodes, metricsMap));
       setSelectedNode(current => {
-        if (!current || current.type === 'group') return current;
+        if (!current || isGroupNode(current.type)) return current;
         const vms = (current.data?.vms as VmInfo[]) || [];
         const updatedVms = vms.map(vm => metricsMap[vm.ip] ? { ...vm, metrics: metricsMap[vm.ip] } : vm);
         return { ...current, data: { ...current.data, vms: updatedVms } };
@@ -275,7 +287,7 @@ export default function App() {
           const metricsMap: Record<string, VmMetrics> = await response.json();
           setNodes(currentNodes => applyMetricsToNodes(currentNodes, metricsMap));
           setSelectedNode(current => {
-            if (!current || current.type === 'group') return current;
+            if (!current || isGroupNode(current.type)) return current;
             const vms = (current.data?.vms as VmInfo[]) || [];
             const updatedVms = vms.map(vm => metricsMap[vm.ip] ? { ...vm, metrics: metricsMap[vm.ip] } : vm);
             return { ...current, data: { ...current.data, vms: updatedVms } };
@@ -297,7 +309,7 @@ export default function App() {
 
   const businessOwners = useMemo(() => {
     return nodes
-      .filter(node => node.type === 'group')
+      .filter(node => isGroupNode(node.type))
       .map(node => (node.data as GroupNodeData).businessOwner);
   }, [nodes]);
 
@@ -320,7 +332,7 @@ export default function App() {
             onConnect={onConnect}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes}
+            nodeTypes={nodeComponents}
             defaultEdgeOptions={{
               animated: true,
               markerEnd: { type: MarkerType.ArrowClosed },
