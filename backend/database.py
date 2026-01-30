@@ -8,6 +8,7 @@ from environment_config import VALID_ENVIRONMENTS, DEFAULT_ENVIRONMENT
 # Thread-safe database instances per environment
 _db_lock = threading.Lock()
 _db_instances: dict = {}
+_write_locks: dict = {}  # Per-environment write locks
 
 
 def get_db_path(env: str) -> str:
@@ -33,7 +34,16 @@ def get_db(env: str) -> TinyDB:
         with _db_lock:
             if env not in _db_instances:
                 _db_instances[env] = TinyDB(get_db_path(env))
+                _write_locks[env] = threading.Lock()
     return _db_instances[env]
+
+
+def get_write_lock(env: str) -> threading.Lock:
+    """Get the write lock for specific environment."""
+    if env not in VALID_ENVIRONMENTS:
+        env = DEFAULT_ENVIRONMENT
+    get_db(env)  # Ensure lock exists
+    return _write_locks[env]
 
 
 def get_vms_table(env: str):
@@ -48,48 +58,52 @@ def get_metrics_table(env: str):
 
 def save_vm_data(services_data, env: str):
     """Save VM data to TinyDB for specific environment."""
-    table = get_vms_table(env)
-    VmData = Query()
+    with get_write_lock(env):
+        table = get_vms_table(env)
+        VmData = Query()
 
-    record = {
-        "type": "vm_data",
-        "services": services_data.get("services", []),
-        "last_updated": datetime.utcnow().isoformat() + "Z",
-    }
+        record = {
+            "type": "vm_data",
+            "services": services_data.get("services", []),
+            "last_updated": datetime.utcnow().isoformat() + "Z",
+        }
 
-    table.upsert(record, VmData.type == "vm_data")
+        table.upsert(record, VmData.type == "vm_data")
 
 
 def read_vm_data(env: str):
     """Read VM data from TinyDB for specific environment."""
-    table = get_vms_table(env)
-    VmData = Query()
+    with get_write_lock(env):
+        table = get_vms_table(env)
+        VmData = Query()
 
-    result = table.search(VmData.type == "vm_data")
-    return result[0] if result else None
+        result = table.search(VmData.type == "vm_data")
+        return result[0] if result else None
 
 
 def save_metrics_data(metrics_by_ip, env: str):
     """Save metrics data to TinyDB for specific environment."""
-    table = get_metrics_table(env)
-    MetricsData = Query()
+    with get_write_lock(env):
+        table = get_metrics_table(env)
+        MetricsData = Query()
 
-    record = {
-        "type": "metrics_data",
-        "metrics_by_ip": metrics_by_ip,
-        "last_updated": datetime.utcnow().isoformat() + "Z",
-    }
+        record = {
+            "type": "metrics_data",
+            "metrics_by_ip": metrics_by_ip,
+            "last_updated": datetime.utcnow().isoformat() + "Z",
+        }
 
-    table.upsert(record, MetricsData.type == "metrics_data")
+        table.upsert(record, MetricsData.type == "metrics_data")
 
 
 def read_metrics_data(env: str):
     """Read metrics data from TinyDB for specific environment."""
-    table = get_metrics_table(env)
-    MetricsData = Query()
+    with get_write_lock(env):
+        table = get_metrics_table(env)
+        MetricsData = Query()
 
-    result = table.search(MetricsData.type == "metrics_data")
-    return result[0] if result else None
+        result = table.search(MetricsData.type == "metrics_data")
+        return result[0] if result else None
 
 
 def get_all_vm_ips(env: str):
@@ -105,3 +119,34 @@ def get_all_vm_ips(env: str):
             if ip:
                 ips.append(ip)
     return ips
+
+
+# Jenkins data functions (environment-agnostic, uses default env db)
+def get_jenkins_table():
+    """Get the Jenkins table (stored in default environment db)."""
+    return get_db(DEFAULT_ENVIRONMENT).table("jenkins")
+
+
+def save_jenkins_data(jobs_data):
+    """Save Jenkins build data to TinyDB."""
+    with get_write_lock(DEFAULT_ENVIRONMENT):
+        table = get_jenkins_table()
+        JenkinsData = Query()
+
+        record = {
+            "type": "jenkins_data",
+            "jobs": jobs_data,
+            "last_updated": datetime.utcnow().isoformat() + "Z",
+        }
+
+        table.upsert(record, JenkinsData.type == "jenkins_data")
+
+
+def read_jenkins_data():
+    """Read Jenkins build data from TinyDB."""
+    with get_write_lock(DEFAULT_ENVIRONMENT):
+        table = get_jenkins_table()
+        JenkinsData = Query()
+
+        result = table.search(JenkinsData.type == "jenkins_data")
+        return result[0] if result else None

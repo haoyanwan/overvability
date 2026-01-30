@@ -20,7 +20,11 @@ import {
 
 const API_BASE = '';
 const VM_POLL_INTERVAL = 30 * 60 * 1000;
-const METRICS_POLL_INTERVAL = 30 * 1000;
+const METRICS_POLL_INTERVAL = 10 * 1000;
+
+interface JenkinsJob {
+  name: string;
+}
 
 function createNodesWithGroups(services: ServiceFromApi[], savedLayout?: SavedLayout): Node[] {
   const servicesByOwner: Record<string, ServiceFromApi[]> = {};
@@ -74,6 +78,7 @@ function createNodesWithGroups(services: ServiceFromApi[], savedLayout?: SavedLa
           resourceGroup: service.resourceGroup || '',
           environment: getEnvironment(service.resourceGroup || ''),
           status: service.vms.every(vm => vm.status === 'running') ? 'healthy' : 'unhealthy',
+          jenkinsJob: service.jenkinsJob,
           vms: service.vms,
         },
         draggable: true,
@@ -113,6 +118,7 @@ export default function App() {
   const [edges, setEdges] = useState<{ id: string; source: string; target: string }[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [jenkinsJobs, setJenkinsJobs] = useState<string[]>([]);
   const prevEnvironmentRef = useRef(environment);
 
   const onNodesChange = useCallback(
@@ -239,10 +245,11 @@ export default function App() {
       }
 
       try {
-        const [layoutRes, vmsRes, metricsRes] = await Promise.all([
+        const [layoutRes, vmsRes, metricsRes, jenkinsRes] = await Promise.all([
           fetch(`${API_BASE}/api/${environment}/layout`),
           fetch(`${API_BASE}/api/${environment}/vms`),
           fetch(`${API_BASE}/api/${environment}/metrics`),
+          fetch(`${API_BASE}/api/jenkins/builds`),
         ]);
 
         if (!isMounted) return;
@@ -250,6 +257,12 @@ export default function App() {
         const savedLayout: SavedLayout = layoutRes.ok ? await layoutRes.json() : {};
         const vmsData = vmsRes.ok ? await vmsRes.json() : { services: [] };
         const metricsMap: Record<string, VmMetrics> = metricsRes.ok ? await metricsRes.json() : {};
+
+        // Extract Jenkins job names
+        if (jenkinsRes.ok) {
+          const jenkinsData = await jenkinsRes.json();
+          setJenkinsJobs(jenkinsData.jobs?.map((j: JenkinsJob) => j.name) || []);
+        }
 
         let newNodes = createNodesWithGroups(vmsData.services, savedLayout);
         newNodes = applyMetricsToNodes(newNodes, metricsMap);
@@ -313,6 +326,28 @@ export default function App() {
       .map(node => (node.data as GroupNodeData).businessOwner);
   }, [nodes]);
 
+  const setServiceJenkinsJob = useCallback(async (serviceName: string, jenkinsJob: string | null) => {
+    await fetch(`${API_BASE}/api/${environment}/services/${serviceName}/jenkins`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jenkinsJob }),
+    });
+
+    // Update local state
+    setNodes(nodes => nodes.map(n =>
+      n.id === serviceName
+        ? { ...n, data: { ...n.data, jenkinsJob } }
+        : n
+    ));
+
+    // Update selected node if it's the one being modified
+    setSelectedNode(current =>
+      current?.id === serviceName
+        ? { ...current, data: { ...current.data, jenkinsJob } }
+        : current
+    );
+  }, [environment]);
+
   return (
     <ReactFlowProvider>
       <div className="app-layout">
@@ -342,7 +377,12 @@ export default function App() {
             <Background />
             <Controls />
           </ReactFlow>
-          <Sidebar node={selectedNode} onClose={() => setSelectedNode(null)} />
+          <Sidebar
+            node={selectedNode}
+            onClose={() => setSelectedNode(null)}
+            jenkinsJobs={jenkinsJobs}
+            onJenkinsJobChange={setServiceJenkinsJob}
+          />
         </div>
       </div>
     </ReactFlowProvider>

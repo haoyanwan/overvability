@@ -70,7 +70,30 @@
   margin: 0;
 }
 
-.sidebar-header button {
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-edit-btn {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-edit-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.sidebar-close-btn {
   background: none;
   border: none;
   color: var(--text-secondary);
@@ -80,7 +103,7 @@
   line-height: 1;
 }
 
-.sidebar-header button:hover {
+.sidebar-close-btn:hover {
   color: var(--text-primary);
 }
 
@@ -116,22 +139,49 @@
   color: var(--text-primary);
 }
 
+/* Jenkins Job selector */
+.sidebar-jenkins {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+}
+
+.sidebar-jenkins-value {
+  display: block;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.sidebar-jenkins-select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.sidebar-jenkins-select:hover {
+  border-color: var(--border-hover);
+}
+
+.sidebar-jenkins-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.sidebar-jenkins-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 .sidebar-vms {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--border-color);
-}
-
-.sidebar-vms-title {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  padding: 8px 12px;
-  background: var(--bg-tertiary);
-  border-left: 3px solid #3b82f6;
-  border-radius: 4px;
 }
 
 .sidebar-vm {
@@ -240,4 +290,115 @@
 
 .metric-na {
   color: var(--text-muted);
+}
+
+/* Jenkins Build Details */
+.sidebar-jenkins-details {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.sidebar-jenkins-loading,
+.sidebar-jenkins-error {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 8px;
+}
+
+.jenkins-status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.jenkins-status-badge.jenkins-success {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.jenkins-status-badge.jenkins-failure {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.jenkins-status-badge.jenkins-unknown {
+  background: rgba(156, 163, 175, 0.15);
+  color: #9ca3af;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
+.sidebar-jenkins-build {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--border-color);
+}
+
+.sidebar-jenkins-build.sidebar-jenkins-build-success {
+  border-left-color: #22c55e;
+}
+
+.sidebar-jenkins-build.sidebar-jenkins-build-failure {
+  border-left-color: #ef4444;
+}
+
+.sidebar-jenkins-build-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.sidebar-jenkins-build-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.sidebar-jenkins-build-label {
+  color: var(--text-muted);
+}
+
+.sidebar-jenkins-build-value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.sidebar-jenkins-link {
+  display: inline-block;
+  font-size: 11px;
+  color: #3b82f6;
+  text-decoration: none;
+  margin-top: 6px;
+  transition: color 0.15s ease;
+}
+
+.sidebar-jenkins-link:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+.sidebar-jenkins-link-main {
+  display: block;
+  text-align: center;
+  padding: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+  margin-top: 8px;
+  font-weight: 500;
 }

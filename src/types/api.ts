@@ -12,6 +12,7 @@ export interface ServiceFromApi {
   businessOwner: string;
   resourceGroup?: string;
   port?: string;
+  jenkinsJob?: string | null;
   vms: {
     name: string;
     ip: string;
@@ -31,3 +32,26 @@ export interface VmsApiResponse {
 
 // Metrics API response - map of IP to metrics
 export type MetricsApiResponse = Record<string, VmMetrics>;
+
+// Jenkins build information
+export interface JenkinsBuild {
+  number: number;
+  url: string;
+  result?: string;
+  timestamp: number;
+  duration?: number;
+}
+
+export interface JenkinsJob {
+  name: string;
+  url: string;
+  color: string;
+  lastBuild: JenkinsBuild | null;
+  lastSuccessfulBuild: JenkinsBuild | null;
+  lastFailedBuild: JenkinsBuild | null;
+}
+
+export interface JenkinsJobResponse {
+  job: JenkinsJob;
+  last_updated?: string;
+}
