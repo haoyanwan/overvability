@@ -7,7 +7,7 @@ npm ci
 npm run build
 
 # Install Python deps
-pip3 install -r backend/requirements.txt
+pip3.9 install -r backend/requirements.txt
 
 # First-run: install systemd service
 if [ ! -f /etc/systemd/system/navimow-observability.service ]; then

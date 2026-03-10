@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/data/navimow-observability/backend
-ExecStart=/usr/bin/python3 app.py
+ExecStart=/usr/bin/python3.9 app.py
 Restart=always
 RestartSec=5
 EnvironmentFile=/data/navimow-observability/backend/.env

@@ -8,3 +8,4 @@ azure-mgmt-subscription
 prometheus-api-client==0.5.3
 tinydb
 requests
+six
