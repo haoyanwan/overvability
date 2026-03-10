@@ -9,7 +9,8 @@ function getAggregatedMetrics(vms: VmInfo[]) {
     const cpuAvgs: number[] = [];
     const memPeaks: number[] = [];
     const memAvgs: number[] = [];
-    const storages: number[] = [];
+    const rootStorages: number[] = [];
+    const dataStorages: number[] = [];
 
     for (const vm of vms) {
         if (vm.metrics) {
@@ -17,11 +18,11 @@ function getAggregatedMetrics(vms: VmInfo[]) {
             if (vm.metrics.cpu.avg !== null) cpuAvgs.push(vm.metrics.cpu.avg);
             if (vm.metrics.memory.peak !== null) memPeaks.push(vm.metrics.memory.peak);
             if (vm.metrics.memory.avg !== null) memAvgs.push(vm.metrics.memory.avg);
-            if (vm.metrics.storage.dataMount !== null) storages.push(vm.metrics.storage.dataMount);
+            if (vm.metrics.storage.rootMount !== null) rootStorages.push(vm.metrics.storage.rootMount);
+            if (vm.metrics.storage.dataMount !== null) dataStorages.push(vm.metrics.storage.dataMount);
         }
     }
 
-    const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
     const max = (arr: number[]) => arr.length > 0 ? Math.max(...arr) : null;
 
     return {
@@ -29,7 +30,8 @@ function getAggregatedMetrics(vms: VmInfo[]) {
         cpuAvg: max(cpuAvgs),
         memPeak: max(memPeaks),
         memAvg: max(memAvgs),
-        storageAvg: max(storages),
+        rootStorage: max(rootStorages),
+        dataStorage: max(dataStorages),
     };
 }
 
@@ -96,8 +98,11 @@ export function JavaProcessNode({ data, selected }: JavaProcessNodeProps) {
                 </div>
                 <div className="service-node__metrics-row">
                     <span className="service-node__metrics-label">存储</span>
-                    <span className={`service-node__metrics-value service-node__metrics-value--wide no-flickr ${getMetricColorClass(metrics.storageAvg)}`}>
-                        {formatMetric(metrics.storageAvg)}
+                    <span className={`service-node__metrics-value no-flickr ${getMetricColorClass(metrics.rootStorage)}`}>
+                        / {formatMetric(metrics.rootStorage)}
+                    </span>
+                    <span className={`service-node__metrics-value no-flickr ${getMetricColorClass(metrics.dataStorage)}`}>
+                        /data {formatMetric(metrics.dataStorage)}
                     </span>
                 </div>
             </div>

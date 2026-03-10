@@ -7,6 +7,7 @@ import { LoadingOverlay } from './components/LoadingOverlay';
 import { LeftNavPanel } from './components/LeftNavPanel';
 import { useEnvironment } from './context/EnvironmentContext';
 import { nodeComponents } from './nodes';
+import { fetchBulkMetrics } from './services/prometheusService';
 import {
   NODE_TYPES,
   isGroupNode,
@@ -20,7 +21,13 @@ import {
 
 const API_BASE = '';
 const VM_POLL_INTERVAL = 30 * 60 * 1000;
-const METRICS_POLL_INTERVAL = 10 * 1000;
+
+const METRICS_REFRESH_OPTIONS = [
+  { label: '15s', value: 15_000 },
+  { label: '30s', value: 30_000 },
+  { label: '60s', value: 60_000 },
+  { label: '暂停', value: 0 },
+];
 
 interface JenkinsJob {
   name: string;
@@ -119,6 +126,7 @@ export default function App() {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [jenkinsJobs, setJenkinsJobs] = useState<string[]>([]);
+  const [metricsRefreshInterval, setMetricsRefreshInterval] = useState(15_000);
   const prevEnvironmentRef = useRef(environment);
 
   const onNodesChange = useCallback(
@@ -189,11 +197,17 @@ export default function App() {
     }
   }, [environment]);
 
-  const fetchMetrics = useCallback(async () => {
+  const fetchMetrics = useCallback(async (nodeList?: Node[]) => {
     try {
-      const response = await fetch(`${API_BASE}/api/${environment}/metrics`);
-      if (!response.ok) return;
-      const metricsMap: Record<string, VmMetrics> = await response.json();
+      const source = nodeList ?? nodes;
+      const ips = source
+        .filter(n => !isGroupNode(n.type))
+        .flatMap(n => ((n.data?.vms as VmInfo[]) || []).map(vm => vm.ip))
+        .filter(Boolean);
+
+      if (ips.length === 0) return;
+
+      const metricsMap = await fetchBulkMetrics(ips);
 
       setNodes(currentNodes => applyMetricsToNodes(currentNodes, metricsMap));
       setSelectedNode(current => {
@@ -205,7 +219,7 @@ export default function App() {
     } catch (error) {
       console.error('Failed to fetch metrics:', error);
     }
-  }, [environment]);
+  }, [nodes]);
 
   const refreshData = useCallback(async () => {
     try {
@@ -217,21 +231,21 @@ export default function App() {
       const savedLayout: SavedLayout = layoutRes.ok ? await layoutRes.json() : {};
       const vmsData = vmsRes.ok ? await vmsRes.json() : { services: [] };
 
-      setNodes(createNodesWithGroups(vmsData.services, savedLayout));
+      const newNodes = createNodesWithGroups(vmsData.services, savedLayout);
+      setNodes(newNodes);
       if (savedLayout.edges) {
         setEdges(savedLayout.edges);
       }
 
-      await fetchMetrics();
+      await fetchMetrics(newNodes);
     } catch (error) {
       console.error('Failed to refresh data:', error);
     }
   }, [fetchMetrics, environment]);
 
-  // Initialize and poll data
+  // Initialize and poll VM data
   useEffect(() => {
     let vmPollTimer: ReturnType<typeof setInterval> | null = null;
-    let metricsPollTimer: ReturnType<typeof setInterval> | null = null;
     let isMounted = true;
 
     const init = async () => {
@@ -245,10 +259,9 @@ export default function App() {
       }
 
       try {
-        const [layoutRes, vmsRes, metricsRes, jenkinsRes] = await Promise.all([
+        const [layoutRes, vmsRes, jenkinsRes] = await Promise.all([
           fetch(`${API_BASE}/api/${environment}/layout`),
           fetch(`${API_BASE}/api/${environment}/vms`),
-          fetch(`${API_BASE}/api/${environment}/metrics`),
           fetch(`${API_BASE}/api/jenkins/builds`),
         ]);
 
@@ -256,7 +269,6 @@ export default function App() {
 
         const savedLayout: SavedLayout = layoutRes.ok ? await layoutRes.json() : {};
         const vmsData = vmsRes.ok ? await vmsRes.json() : { services: [] };
-        const metricsMap: Record<string, VmMetrics> = metricsRes.ok ? await metricsRes.json() : {};
 
         // Extract Jenkins job names
         if (jenkinsRes.ok) {
@@ -264,12 +276,22 @@ export default function App() {
           setJenkinsJobs(jenkinsData.jobs?.map((j: JenkinsJob) => j.name) || []);
         }
 
-        let newNodes = createNodesWithGroups(vmsData.services, savedLayout);
-        newNodes = applyMetricsToNodes(newNodes, metricsMap);
-
+        const newNodes = createNodesWithGroups(vmsData.services, savedLayout);
         setNodes(newNodes);
         if (savedLayout.edges) {
           setEdges(savedLayout.edges);
+        }
+
+        // Fetch metrics directly from Prometheus using IPs from the new nodes
+        const ips = newNodes
+          .filter(n => !isGroupNode(n.type))
+          .flatMap(n => ((n.data?.vms as VmInfo[]) || []).map(vm => vm.ip))
+          .filter(Boolean);
+        if (ips.length > 0) {
+          const metricsMap = await fetchBulkMetrics(ips);
+          if (isMounted) {
+            setNodes(cur => applyMetricsToNodes(cur, metricsMap));
+          }
         }
       } catch (error) {
         console.error('Failed to initialize:', error);
@@ -291,24 +313,6 @@ export default function App() {
           console.error('Failed to poll VM data:', error);
         }
       }, VM_POLL_INTERVAL);
-
-      metricsPollTimer = setInterval(async () => {
-        if (!isMounted) return;
-        try {
-          const response = await fetch(`${API_BASE}/api/${environment}/metrics`);
-          if (!response.ok) return;
-          const metricsMap: Record<string, VmMetrics> = await response.json();
-          setNodes(currentNodes => applyMetricsToNodes(currentNodes, metricsMap));
-          setSelectedNode(current => {
-            if (!current || isGroupNode(current.type)) return current;
-            const vms = (current.data?.vms as VmInfo[]) || [];
-            const updatedVms = vms.map(vm => metricsMap[vm.ip] ? { ...vm, metrics: metricsMap[vm.ip] } : vm);
-            return { ...current, data: { ...current.data, vms: updatedVms } };
-          });
-        } catch (error) {
-          console.error('Failed to poll metrics:', error);
-        }
-      }, METRICS_POLL_INTERVAL);
     };
 
     init();
@@ -316,9 +320,15 @@ export default function App() {
     return () => {
       isMounted = false;
       if (vmPollTimer) clearInterval(vmPollTimer);
-      if (metricsPollTimer) clearInterval(metricsPollTimer);
     };
   }, [environment]);
+
+  // Metrics polling with configurable interval
+  useEffect(() => {
+    if (metricsRefreshInterval === 0) return;
+    const timer = setInterval(fetchMetrics, metricsRefreshInterval);
+    return () => clearInterval(timer);
+  }, [metricsRefreshInterval, fetchMetrics]);
 
   const businessOwners = useMemo(() => {
     return nodes
@@ -357,6 +367,9 @@ export default function App() {
           onSave={saveLayout}
           onReset={resetLayout}
           onRefresh={refreshData}
+          metricsRefreshInterval={metricsRefreshInterval}
+          onMetricsRefreshChange={setMetricsRefreshInterval}
+          metricsRefreshOptions={METRICS_REFRESH_OPTIONS}
         />
         <div className="react-flow-container">
           <ReactFlow

@@ -19,5 +19,5 @@ export const vmLabels: Record<string, string> = {
 export const vmMetricsLabels = {
   cpu: { peak: 'CPU 峰值', avg: 'CPU 平均', low: 'CPU 最低' },
   memory: { peak: '内存峰值', avg: '内存平均', low: '内存最低' },
-  storage: { dataMount: '/data 使用率' },
+  storage: { rootMount: '/ 使用率', dataMount: '/data 使用率' },
 };

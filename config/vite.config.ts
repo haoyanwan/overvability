@@ -18,6 +18,11 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      '/prometheus': {
+        target: 'http://10.139.200.211:9090',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/prometheus/, ''),
+      },
     },
   },
 })

@@ -295,6 +295,12 @@ export function Sidebar({ node, onClose, jenkinsJobs, onJenkinsJobChange }: Side
                     <div className="sidebar-vm-metrics-group">
                       <div className="sidebar-vm-metrics-group-title">存储</div>
                       <div className="sidebar-vm-metrics-row">
+                        <span className="sidebar-vm-metrics-label">{vmMetricsLabels.storage.rootMount}</span>
+                        <span className={`sidebar-vm-metrics-value ${getMetricColorClass(vm.metrics.storage.rootMount)}`}>
+                          {formatMetric(vm.metrics.storage.rootMount)}
+                        </span>
+                      </div>
+                      <div className="sidebar-vm-metrics-row">
                         <span className="sidebar-vm-metrics-label">{vmMetricsLabels.storage.dataMount}</span>
                         <span className={`sidebar-vm-metrics-value ${getMetricColorClass(vm.metrics.storage.dataMount)}`}>
                           {formatMetric(vm.metrics.storage.dataMount)}

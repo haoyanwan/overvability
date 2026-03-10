@@ -3,7 +3,7 @@ import json
 import time
 import threading
 from datetime import datetime
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 from azure.identity import ClientSecretCredential
@@ -15,9 +15,6 @@ from prometheus_service import prometheus_service
 from database import (
     save_vm_data,
     read_vm_data,
-    save_metrics_data,
-    read_metrics_data,
-    get_all_vm_ips,
     get_layout_path,
     save_jenkins_data,
     read_jenkins_data,
@@ -35,9 +32,6 @@ app = Flask(__name__)
 CORS(app)
 
 VM_DATA_INTERVAL = 30 * 60  # 30 minutes for Azure VM data
-METRICS_INTERVAL = int(
-    os.getenv("METRICS_INTERVAL", "20")
-)  # seconds for Prometheus metrics
 JENKINS_INTERVAL = int(
     os.getenv("JENKINS_INTERVAL", "30")
 )  # seconds for Jenkins builds
@@ -192,22 +186,6 @@ def background_vm_fetch():
         time.sleep(VM_DATA_INTERVAL)
 
 
-def background_metrics_fetch():
-    """Background thread that fetches metrics for all environments."""
-    while True:
-        try:
-            for env in VALID_ENVIRONMENTS:
-                ips = get_all_vm_ips(env)
-                if ips:
-                    metrics = prometheus_service.get_bulk_metrics(ips)
-                    save_metrics_data(metrics, env)
-                    print(f"[Metrics Sync] Updated metrics for {len(ips)} VMs in {env}")
-        except Exception as e:
-            print(f"[Metrics Sync] Error: {e}")
-
-        time.sleep(METRICS_INTERVAL)
-
-
 def fetch_jenkins_data():
     """Fetch Jenkins build data from API."""
     jenkins_url = os.getenv("JENKINS_URL").rstrip("/")
@@ -247,14 +225,20 @@ def get_vms(env: str):
     )
 
 
-@app.route("/api/<env>/metrics")
-def get_metrics(env: str):
-    """Get metrics for specific environment."""
-    env = validate_env(env)
-    data = read_metrics_data(env)
-    if data:
-        return jsonify(data.get("metrics_by_ip", {}))
-    return jsonify({})
+@app.route("/prometheus/<path:path>")
+def proxy_prometheus(path: str):
+    """Proxy requests to Prometheus for frontend direct access."""
+    prometheus_url = prometheus_service.url
+    if not prometheus_url:
+        return jsonify({"error": "Prometheus not configured"}), 503
+    resp = requests.get(
+        f"{prometheus_url}/{path}", params=request.args, timeout=30
+    )
+    return (
+        resp.content,
+        resp.status_code,
+        {"Content-Type": resp.headers.get("Content-Type", "application/json")},
+    )
 
 
 @app.route("/api/<env>/layout", methods=["GET"])
@@ -367,15 +351,20 @@ def set_service_jenkins(env: str, service_name: str):
     return jsonify({"success": True})
 
 
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_spa(path):
+    dist = os.path.join(os.path.dirname(__file__), "..", "dist")
+    if path and os.path.exists(os.path.join(dist, path)):
+        return send_from_directory(dist, path)
+    return send_from_directory(dist, "index.html")
+
+
 if __name__ == "__main__":
 
     # Start background VM fetch thread (every 30 minutes)
     vm_thread = threading.Thread(target=background_vm_fetch, daemon=True)
     vm_thread.start()
-
-    # Start background metrics fetch thread (every 10 seconds)
-    metrics_thread = threading.Thread(target=background_metrics_fetch, daemon=True)
-    metrics_thread.start()
 
     # Start background Jenkins fetch thread
     jenkins_thread = threading.Thread(target=background_jenkins_fetch, daemon=True)

@@ -7,6 +7,7 @@ export interface MetricAggregate {
 
 // Storage metrics
 export interface StorageMetrics {
+  rootMount: number | null;  // / usage %
   dataMount: number | null;  // /data usage %
 }
 

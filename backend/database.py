@@ -51,11 +51,6 @@ def get_vms_table(env: str):
     return get_db(env).table("vms")
 
 
-def get_metrics_table(env: str):
-    """Get the metrics table for specific environment."""
-    return get_db(env).table("metrics")
-
-
 def save_vm_data(services_data, env: str):
     """Save VM data to TinyDB for specific environment."""
     with get_write_lock(env):
@@ -78,31 +73,6 @@ def read_vm_data(env: str):
         VmData = Query()
 
         result = table.search(VmData.type == "vm_data")
-        return result[0] if result else None
-
-
-def save_metrics_data(metrics_by_ip, env: str):
-    """Save metrics data to TinyDB for specific environment."""
-    with get_write_lock(env):
-        table = get_metrics_table(env)
-        MetricsData = Query()
-
-        record = {
-            "type": "metrics_data",
-            "metrics_by_ip": metrics_by_ip,
-            "last_updated": datetime.utcnow().isoformat() + "Z",
-        }
-
-        table.upsert(record, MetricsData.type == "metrics_data")
-
-
-def read_metrics_data(env: str):
-    """Read metrics data from TinyDB for specific environment."""
-    with get_write_lock(env):
-        table = get_metrics_table(env)
-        MetricsData = Query()
-
-        result = table.search(MetricsData.type == "metrics_data")
         return result[0] if result else None
 
 
