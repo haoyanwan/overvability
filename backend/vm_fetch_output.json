@@ -1,0 +1,756 @@
+{
+  "services": [
+    {
+      "service": "nacos",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aftersales-base-release-fra-01",
+          "ip": "10.139.0.9",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-fra-04",
+          "ip": "10.139.0.39",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-fra-05",
+          "ip": "10.139.0.38",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "gateway",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aftersales-base-release-fra-01",
+          "ip": "10.139.0.9",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-fra-04",
+          "ip": "10.139.0.39",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-fra-05",
+          "ip": "10.139.0.38",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-aftersales-test-bj-01",
+          "ip": "10.158.2.4",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-bj-01",
+          "ip": "10.158.2.7",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "fleetWeb",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aftersales-fra-frontend-01",
+          "ip": "10.139.0.33",
+          "coreCount": 2,
+          "memory": "8GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "vdf",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aftersales-release-fra-01",
+          "ip": "10.139.0.8",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-aftersales-release-fra-02",
+          "ip": "10.139.0.15",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-aftersales-release-fra-03",
+          "ip": "10.139.0.32",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-test-sg-02",
+          "ip": "10.158.2.9",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-sg-04",
+          "ip": "10.158.2.12",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "aiChat",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-aichatServer-01",
+          "ip": "10.139.0.23",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-test-bj-01",
+          "ip": "10.158.2.7",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "mqttBroker",
+      "businessOwner": "base",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-base-mqttbroker-fra-01",
+          "ip": "10.139.0.52",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-mqttbroker-fra-02",
+          "ip": "10.139.0.53",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-test-sg-03",
+          "ip": "10.158.2.10",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-sg-04",
+          "ip": "10.158.2.12",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "dataClickhouse",
+      "businessOwner": "bigData",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-bigdata-clickhouse-1",
+          "ip": "10.139.212.10",
+          "coreCount": 16,
+          "memory": "32GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-bigdata-clickhouse-2",
+          "ip": "10.139.212.8",
+          "coreCount": 16,
+          "memory": "32GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-bigdata-clickhouse-3",
+          "ip": "10.139.212.9",
+          "coreCount": 16,
+          "memory": "32GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-bigdata-clickhouse-4",
+          "ip": "10.139.212.14",
+          "coreCount": 16,
+          "memory": "32GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "doris",
+      "businessOwner": "bigData",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-bigdata-doris-1",
+          "ip": "10.139.212.19",
+          "coreCount": 16,
+          "memory": "64GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-bigdata-doris-2",
+          "ip": "10.139.212.18",
+          "coreCount": 16,
+          "memory": "64GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-bigdata-doris-3",
+          "ip": "10.139.212.20",
+          "coreCount": 16,
+          "memory": "64GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "flink",
+      "businessOwner": "bigData",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-bigdata-flink-fra-1",
+          "ip": "10.139.212.16",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-bigdata-flink-fra-2",
+          "ip": "10.139.212.15",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-bigdata-flink-fra-3",
+          "ip": "10.139.212.17",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "clickhouse",
+      "businessOwner": "base",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-clickhouse-01",
+          "ip": "10.139.212.4",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-clickhouse-02",
+          "ip": "10.139.212.5",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-clickhouse-03",
+          "ip": "10.139.212.6",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-minimal-focal minimal-20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-clickhouse-04",
+          "ip": "10.139.212.7",
+          "coreCount": 8,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "fleet",
+      "businessOwner": "fleet",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-fleet-fra-01",
+          "ip": "10.139.0.36",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-minimal-focal minimal-20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-fleet-fra-02",
+          "ip": "10.139.0.37",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-minimal-focal minimal-20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-aftersales-test-bj-01",
+          "ip": "10.158.2.4",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-bj-01",
+          "ip": "10.158.2.7",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "harbor",
+      "businessOwner": "base",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-harbor-fra",
+          "ip": "10.139.0.31",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "mowerbot",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-mowerbot-fra-01",
+          "ip": "10.139.0.27",
+          "coreCount": 8,
+          "memory": "32GB",
+          "os": "CentOS 7_5-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-aftersales-test-bj-01",
+          "ip": "10.158.2.4",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-bj-01",
+          "ip": "10.158.2.7",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "o2o",
+      "businessOwner": "o2o",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-o2o-fra-01",
+          "ip": "10.139.0.11",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-o2o-fra-02",
+          "ip": "10.139.0.13",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-test-sg-02",
+          "ip": "10.158.2.9",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-sg-04",
+          "ip": "10.158.2.12",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "openApi",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-openai-fra-01",
+          "ip": "10.139.0.43",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-jammy 22_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-test-sg-02",
+          "ip": "10.158.2.9",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-sg-04",
+          "ip": "10.158.2.12",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "operation",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-operation-fra-01",
+          "ip": "10.139.0.24",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "0001-com-ubuntu-server-jammy 22_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-operation-fra-02",
+          "ip": "10.139.0.57",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-base-test-sg-04",
+          "ip": "10.158.2.12",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    },
+    {
+      "service": "prometheus",
+      "businessOwner": "SRE",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-sre",
+          "ip": "10.139.0.14",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-sre-02",
+          "ip": "10.139.0.41",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "SRE",
+      "businessOwner": "SRE",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-sre",
+          "ip": "10.139.0.14",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-sre-02",
+          "ip": "10.139.0.41",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "0001-com-ubuntu-server-focal 20_04-lts-gen2",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        }
+      ]
+    },
+    {
+      "service": "userLink",
+      "businessOwner": "mowerbot",
+      "resourceGroup": "NINEBOT-WILLAND",
+      "location": "westeurope",
+      "vms": [
+        {
+          "name": "willand-user-link-fra-1",
+          "ip": "10.139.0.20",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-user-link-fra-2",
+          "ip": "10.139.0.21",
+          "coreCount": 4,
+          "memory": "8GB",
+          "os": "ubuntu-24_04-lts server",
+          "status": "running",
+          "subscriptionId": "ae7b76e3-7aa6-4e37-bc9f-fbfb0f9c4618",
+          "resourceGroup": "NINEBOT-WILLAND"
+        },
+        {
+          "name": "willand-aftersales-test-bj-01",
+          "ip": "10.158.2.4",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        },
+        {
+          "name": "willand-base-test-bj-01",
+          "ip": "10.158.2.7",
+          "coreCount": 4,
+          "memory": "16GB",
+          "os": "centos-75-lts-free centos-75-free",
+          "status": "running",
+          "subscriptionId": "49fb90f7-b8fc-4f15-80ec-12b017fe3e94",
+          "resourceGroup": "NINEBOT-WILLAND-TESTENV"
+        }
+      ]
+    }
+  ]
+}

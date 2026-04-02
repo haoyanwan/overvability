@@ -370,7 +370,7 @@ if __name__ == "__main__":
     jenkins_thread = threading.Thread(target=background_jenkins_fetch, daemon=True)
     jenkins_thread.start()
 
-    app.run(port=5000, debug=True, threaded=True)
+    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
 
     # Run initial VM fetch and distribute to all environments
     print("[Startup] Fetching initial VM data for all environments...")
